@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(if [ -d \"Modèl\" ])",
+      "Bash(then mv \"Modèl\"/* Model/)",
+      "Bash(fi)",
+      "Bash(if [ -d \"Kontwolè\" ])",
+      "Bash(then mv \"Kontwolè\"/* Kontrole/)",
+      "Bash(if [ -d \"KonpozanPèsonalize\" ])",
+      "Bash(then mv \"KonpozanPèsonalize\"/* KonpozanPersonalize/)",
+      "Bash(xcodebuild:*)",
+      "Bash(tee:*)",
+      "Read(//private/tmp/**)",
+      "Bash(find:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
