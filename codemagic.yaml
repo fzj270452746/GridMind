@@ -1,20 +1,20 @@
 workflows:
   ios-native-quick-start:
-    name: Mahjong Spot It
+    name: Mahjong Grid Mind
     max_build_duration: 120
     instance_type: mac_mini_m2
     integrations:
-      app_store_connect: spot
+      app_store_connect: grid
     environment:
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: com.spoyt.FxiaSpot
+        bundle_identifier: com.gmd.GridMind
       vars:
         BUNDLE_ID: $bundle_identifier
-        PROJECT_PATH: "FxiaSpot" #5:工程名称
+        PROJECT_PATH: "GridMind" #5:工程名称
         XCODE_WORKSPACE: "$PROJECT_PATH/$PROJECT_PATH.xcworkspace"
         XCODE_SCHEME: $PROJECT_PATH
-        APP_STORE_APPLE_ID: 6754390545
+        APP_STORE_APPLE_ID: 6754394663
       xcode: latest # <-- set to specific version e.g. 14.3, 15.0 to avoid unexpected updates.
       cocoapods: default
     scripts:
