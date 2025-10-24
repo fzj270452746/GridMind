@@ -7,94 +7,162 @@
 
 import Foundation
 
-// MARK: - Tile Generation Strategy Protocol
+// MARK: - Generation Strategy Protocol
 
 protocol StrategyJenerasyon {
     func jenere() -> [MahjongKatyo]
 }
 
-// MARK: - Tile Generation Strategies
-
-fileprivate struct JeneratèKatyoNòmal: StrategyJenerasyon {
-    let tip: TipKatyo
-    let ranjeValè: ClosedRange<Int>
-
-    func jenere() -> [MahjongKatyo] {
-        ranjeValè.map { MahjongKatyo(tip: tip, valè: $0) }
-    }
+protocol StrategyMelanje {
+    func melanje<T>(_ eleman: [T]) -> [T]
 }
 
-fileprivate struct JeneratèKatyoEspesyal: StrategyJenerasyon {
-    let ranjeValè: ClosedRange<Int>
-
-    func jenere() -> [MahjongKatyo] {
-        ranjeValè.map { MahjongKatyo(tip: .mssiu, valè: $0) }
-    }
-}
-
-// MARK: - Tile Factory Protocol
+// MARK: - Factory Protocol
 
 protocol FactoryKatyo {
     func kreeToutKatyo() -> [MahjongKatyo]
     func kreeKatyoAleatwa(kantite: Int) -> [MahjongKatyo]
 }
 
-// MARK: - Shuffling Strategy Protocol
+// MARK: - Shuffle Implementation
 
-protocol StrategyMelanje {
-    func melanje<T>(_ eleman: [T]) -> [T]
-}
-
-fileprivate struct MelanjeAleatwa: StrategyMelanje {
+fileprivate struct AlgoritmMelanjeStandard: StrategyMelanje {
     func melanje<T>(_ eleman: [T]) -> [T] {
-        eleman.shuffled()
+        var kopi = eleman
+        var endèksCourant = kopi.count
+
+        while endèksCourant > 1 {
+            endèksCourant -= 1
+            let endèksAleatwa = Int.random(in: 0...endèksCourant)
+            kopi.swapAt(endèksCourant, endèksAleatwa)
+        }
+
+        return kopi
     }
 }
 
-// MARK: - Concrete Tile Factory
+// MARK: - Tile Generation Implementations
+
+fileprivate struct ProdiktèKatyoOdinè: StrategyJenerasyon {
+    private let tipKatyo: TipKatyo
+    private let ranjeMinMax: (min: Int, max: Int)
+
+    init(tip: TipKatyo, min: Int, max: Int) {
+        self.tipKatyo = tip
+        self.ranjeMinMax = (min, max)
+    }
+
+    func jenere() -> [MahjongKatyo] {
+        var rezilta: [MahjongKatyo] = []
+        for valè in ranjeMinMax.min...ranjeMinMax.max {
+            let katyo = MahjongKatyo(tip: tipKatyo, valè: valè)
+            rezilta.append(katyo)
+        }
+        return rezilta
+    }
+}
+
+fileprivate struct ProdiktèKatyoSpesyal: StrategyJenerasyon {
+    private let limit: Int
+
+    init(kantiteMax: Int) {
+        self.limit = kantiteMax
+    }
+
+    func jenere() -> [MahjongKatyo] {
+        return (1...limit).map { valè in
+            MahjongKatyo(tip: .mssiu, valè: valè)
+        }
+    }
+}
+
+// MARK: - Main Tile Manager Class
 
 class JerèrKatyo: FactoryKatyo {
     static let pataje = JerèrKatyo()
 
-    private let strategyJenerasyon: [StrategyJenerasyon]
-    private let strategyMelanje: StrategyMelanje
+    private var koleksyonJeneratè: [StrategyJenerasyon]
+    private var algoritmMelanje: StrategyMelanje
 
-    private init(
-        strategies: [StrategyJenerasyon]? = nil,
-        melanjeStrategy: StrategyMelanje? = nil
-    ) {
-        self.strategyJenerasyon = strategies ?? Self.kreyeStrategyParDefaut()
-        self.strategyMelanje = melanjeStrategy ?? MelanjeAleatwa()
+    private init() {
+        self.koleksyonJeneratè = []
+        self.algoritmMelanje = AlgoritmMelanjeStandard()
+        konfigireJeneratè()
     }
 
-    private static func kreyeStrategyParDefaut() -> [StrategyJenerasyon] {
-        let tipNòmal: [TipKatyo] = [.hudy, .koieb, .zounl]
-        let strategyNòmal = tipNòmal.map { tip in
-            JeneratèKatyoNòmal(tip: tip, ranjeValè: 1...9)
+    private func konfigireJeneratè() {
+        let tipOdinè: [TipKatyo] = [.hudy, .koieb, .zounl]
+
+        for tip in tipOdinè {
+            let jeneratè = ProdiktèKatyoOdinè(tip: tip, min: 1, max: 9)
+            koleksyonJeneratè.append(jeneratè)
         }
-        let strategyEspesyal = JeneratèKatyoEspesyal(ranjeValè: 1...6)
-        return strategyNòmal + [strategyEspesyal]
-    }
 
-    func jenereToutKatyo() -> [MahjongKatyo] {
-        kreeToutKatyo()
+        let jeneratèSpesyal = ProdiktèKatyoSpesyal(kantiteMax: 6)
+        koleksyonJeneratè.append(jeneratèSpesyal)
     }
 
     func kreeToutKatyo() -> [MahjongKatyo] {
-        strategyJenerasyon.flatMap { $0.jenere() }
-    }
+        var ensanmKatyo: [MahjongKatyo] = []
 
-    func chwaziKatyoAleatwa(kantite: Int) -> [MahjongKatyo] {
-        kreeKatyoAleatwa(kantite: kantite)
+        for jeneratè in koleksyonJeneratè {
+            let katyoJenere = jeneratè.jenere()
+            ensanmKatyo += katyoJenere
+        }
+
+        return ensanmKatyo
     }
 
     func kreeKatyoAleatwa(kantite: Int) -> [MahjongKatyo] {
-        let toutKatyo = kreeToutKatyo()
-        let melanjeKatyo = strategyMelanje.melanje(toutKatyo)
-        return Array(melanjeKatyo.prefix(kantite))
+        let toutKatyoDisponib = kreeToutKatyo()
+        let katyoMelanje = algoritmMelanje.melanje(toutKatyoDisponib)
+
+        let kantiteReyèl = min(kantite, katyoMelanje.count)
+        var seleksyone: [MahjongKatyo] = []
+
+        for i in 0..<kantiteReyèl {
+            seleksyone.append(katyoMelanje[i])
+        }
+
+        return seleksyone
+    }
+
+    func jenereToutKatyo() -> [MahjongKatyo] {
+        return kreeToutKatyo()
+    }
+
+    func chwaziKatyoAleatwa(kantite: Int) -> [MahjongKatyo] {
+        return kreeKatyoAleatwa(kantite: kantite)
     }
 
     func melanje(_ katyo: [MahjongKatyo]) -> [MahjongKatyo] {
-        strategyMelanje.melanje(katyo)
+        return algoritmMelanje.melanje(katyo)
+    }
+
+    func melanjeAvèkSeed(_ katyo: [MahjongKatyo], seed: Int) -> [MahjongKatyo] {
+        var kopi = katyo
+        var rng = SeededRandomGenerator(seed: seed)
+
+        for i in stride(from: kopi.count - 1, through: 1, by: -1) {
+            let j = Int(rng.next() % UInt32(i + 1))
+            kopi.swapAt(i, j)
+        }
+
+        return kopi
+    }
+}
+
+// MARK: - Seeded Random Generator
+
+fileprivate struct SeededRandomGenerator {
+    private var state: UInt32
+
+    init(seed: Int) {
+        self.state = UInt32(truncatingIfNeeded: seed)
+    }
+
+    mutating func next() -> UInt32 {
+        state = state &* 1103515245 &+ 12345
+        return (state / 65536) % 32768
     }
 }

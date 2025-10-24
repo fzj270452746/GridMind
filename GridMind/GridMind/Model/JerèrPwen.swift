@@ -7,7 +7,7 @@
 
 import Foundation
 
-// MARK: - Score Value Object
+// MARK: - Score Record Model
 
 struct AnrejistrePwen: Codable {
     let nivo: NivoJwe
@@ -15,30 +15,34 @@ struct AnrejistrePwen: Codable {
     let dat: Date
 
     var datAfiche: String {
-        KonvertisèDat.shared.konvètiAnTèks(dat)
+        return FabrikFormatèDat.kreye().transforme(dat)
     }
 }
 
-// MARK: - Date Converter Utility
+// MARK: - Date Formatting
 
-fileprivate class KonvertisèDat {
-    static let shared = KonvertisèDat()
+fileprivate struct FabrikFormatèDat {
+    static func kreye() -> FormatèDatPèsonalize {
+        return FormatèDatPèsonalize()
+    }
+}
 
-    private lazy var formatè: DateFormatter = {
+fileprivate struct FormatèDatPèsonalize {
+    private let formatèEntèn: DateFormatter
+
+    init() {
         let f = DateFormatter()
         f.dateStyle = .medium
         f.timeStyle = .short
-        return f
-    }()
+        self.formatèEntèn = f
+    }
 
-    private init() {}
-
-    func konvètiAnTèks(_ dat: Date) -> String {
-        formatè.string(from: dat)
+    func transforme(_ dat: Date) -> String {
+        return formatèEntèn.string(from: dat)
     }
 }
 
-// MARK: - Storage Protocol
+// MARK: - Storage Abstraction
 
 protocol StockajDone {
     func konsève<T: Encodable>(_ valè: T, ak kle: String)
@@ -46,152 +50,195 @@ protocol StockajDone {
     func efase(kle: String)
 }
 
-// MARK: - UserDefaults Storage Implementation
-
-fileprivate class StockajUserDefaults: StockajDone {
-    private let defaults: UserDefaults
-
-    init(defaults: UserDefaults = .standard) {
-        self.defaults = defaults
-    }
-
-    func konsève<T: Encodable>(_ valè: T, ak kle: String) {
-        guard let enkode = try? JSONEncoder().encode(valè) else { return }
-        defaults.set(enkode, forKey: kle)
-    }
-
-    func rekipere<T: Decodable>(kle: String) -> T? {
-        guard let done = defaults.data(forKey: kle),
-              let dekode = try? JSONDecoder().decode(T.self, from: done) else {
-            return nil
-        }
-        return dekode
-    }
-
-    func efase(kle: String) {
-        defaults.removeObject(forKey: kle)
-    }
-}
-
-// MARK: - Score Repository Protocol
-
 protocol RepozitwarPwen {
     func anrejistre(_ pwen: AnrejistrePwen)
     func rekiperetTout() -> [AnrejistrePwen]
     func filtreParNivo(_ nivo: NivoJwe) -> [AnrejistrePwen]
 }
 
-// MARK: - Bonus Calculator Protocol
+// MARK: - UserDefaults Adapter
+
+fileprivate class AdaptèUserDefaults: StockajDone {
+    private let sistèmDefaults: UserDefaults
+    private let ancodè: JSONEncoder
+    private let decodè: JSONDecoder
+
+    init(sistèm: UserDefaults = .standard) {
+        self.sistèmDefaults = sistèm
+        self.ancodè = JSONEncoder()
+        self.decodè = JSONDecoder()
+    }
+
+    func konsève<T: Encodable>(_ valè: T, ak kle: String) {
+        do {
+            let doneAncode = try ancodè.encode(valè)
+            sistèmDefaults.set(doneAncode, forKey: kle)
+        } catch {
+            print("Erè ancodaj: \(error)")
+        }
+    }
+
+    func rekipere<T: Decodable>(kle: String) -> T? {
+        guard let doneRaw = sistèmDefaults.data(forKey: kle) else {
+            return nil
+        }
+
+        do {
+            let valèDecode = try decodè.decode(T.self, from: doneRaw)
+            return valèDecode
+        } catch {
+            print("Erè decodaj: \(error)")
+            return nil
+        }
+    }
+
+    func efase(kle: String) {
+        sistèmDefaults.removeObject(forKey: kle)
+    }
+}
+
+// MARK: - Bonus Calculation Strategy
 
 protocol KalkilatèBonus {
     func kalkile(kontrè: Int) -> Int
 }
 
-fileprivate struct KalkilatèBonusKonsekirif: KalkilatèBonus {
-    private let sekilMinimòm: Int = 3
-    private let bonusBaz: Int = 50
-    private let miltiplikatè: Int = 25
+fileprivate struct AlgoritmBonusProgresif: KalkilatèBonus {
+    private let sekilAktivasyon: Int
+    private let pwen初始: Int
+    private let pwen递增: Int
+
+    init() {
+        self.sekilAktivasyon = 3
+        self.pwen初始 = 50
+        self.pwen递增 = 25
+    }
 
     func kalkile(kontrè: Int) -> Int {
-        guard kontrè >= sekilMinimòm else { return 0 }
-        return bonusBaz + (kontrè - (sekilMinimòm - 1)) * miltiplikatè
+        if kontrè < sekilAktivasyon {
+            return 0
+        }
+
+        let nivoBonus = kontrè - sekilAktivasyon + 1
+        let bonusTotal = pwen初始 + (nivoBonus * pwen递增)
+        return bonusTotal
     }
 }
 
-// MARK: - Streak Tracker
+// MARK: - Streak Management
 
-fileprivate class SuiviKonsekirif {
-    private let stockaj: StockajDone
-    private let kle: String
+fileprivate class JerèrKonsekirif {
+    private var depozitwa: StockajDone
+    private var identifikasyonKle: String
 
-    init(stockaj: StockajDone, kle: String) {
-        self.stockaj = stockaj
-        self.kle = kle
+    init(depozitwa: StockajDone, kle: String) {
+        self.depozitwa = depozitwa
+        self.identifikasyonKle = kle
     }
 
-    var valèAktiyèl: Int {
-        stockaj.rekipere(kle: kle) ?? 0
+    func liValè() -> Int {
+        let rezilta: Int? = depozitwa.rekipere(kle: identifikasyonKle)
+        return rezilta ?? 0
     }
 
-    func ogmante() {
-        stockaj.konsève(valèAktiyèl + 1, ak: kle)
+    func enkremante() {
+        let nouvoValè = liValè() + 1
+        depozitwa.konsève(nouvoValè, ak: identifikasyonKle)
     }
 
     func reyinisyalize() {
-        stockaj.konsève(0, ak: kle)
+        depozitwa.konsève(0, ak: identifikasyonKle)
     }
 }
 
-// MARK: - Score Manager Implementation
+// MARK: - Main Score Manager
 
 class JerèrPwen: RepozitwarPwen {
     static let pataje = JerèrPwen()
 
-    private let stockaj: StockajDone
-    private let suiviKonsekirif: SuiviKonsekirif
-    private let kalkilatè: KalkilatèBonus
+    private var sistèmStockaj: StockajDone
+    private var jeranKonsekirif: JerèrKonsekirif
+    private var motèKalkilBonus: KalkilatèBonus
 
-    private let kleAnrejistreman = "AnrejistrePwenKle"
+    private let kleData = "AnrejistrePwenKle"
     private let kleSesyon = "KontreSesyonSiyès"
 
-    private init(
-        stockaj: StockajDone? = nil,
-        kalkilatè: KalkilatèBonus? = nil
-    ) {
-        let stock = stockaj ?? StockajUserDefaults()
-        self.stockaj = stock
-        self.suiviKonsekirif = SuiviKonsekirif(stockaj: stock, kle: kleSesyon)
-        self.kalkilatè = kalkilatè ?? KalkilatèBonusKonsekirif()
+    private init() {
+        let stockaj = AdaptèUserDefaults()
+        self.sistèmStockaj = stockaj
+        self.jeranKonsekirif = JerèrKonsekirif(depozitwa: stockaj, kle: kleSesyon)
+        self.motèKalkilBonus = AlgoritmBonusProgresif()
+    }
+
+    func anrejistre(_ pwen: AnrejistrePwen) {
+        var listEgzistan = rekiperetTout()
+        listEgzistan.append(pwen)
+        sistèmStockaj.konsève(listEgzistan, ak: kleData)
+    }
+
+    func rekiperetTout() -> [AnrejistrePwen] {
+        let rezilta: [AnrejistrePwen]? = sistèmStockaj.rekipere(kle: kleData)
+        return rezilta ?? []
+    }
+
+    func filtreParNivo(_ nivo: NivoJwe) -> [AnrejistrePwen] {
+        let toutAnrejistreman = rekiperetTout()
+
+        let filtreResulta = toutAnrejistreman.filter { anrejistreman in
+            return anrejistreman.nivo == nivo && anrejistreman.pwen > 0
+        }
+
+        let triye = filtreResulta.sorted { premye, dezyèm in
+            return premye.pwen > dezyèm.pwen
+        }
+
+        return triye
     }
 
     func konsève(_ pwen: Int, pou nivo: NivoJwe) {
         guard pwen > 0 else { return }
-        let nouvo = AnrejistrePwen(nivo: nivo, pwen: pwen, dat: Date())
-        anrejistre(nouvo)
-    }
 
-    func anrejistre(_ pwen: AnrejistrePwen) {
-        let tout = rekiperetTout()
-        let nouvoLis = tout + [pwen]
-        stockaj.konsève(nouvoLis, ak: kleAnrejistreman)
+        let nouvoAnrejistreman = AnrejistrePwen(
+            nivo: nivo,
+            pwen: pwen,
+            dat: Date()
+        )
+
+        anrejistre(nouvoAnrejistreman)
     }
 
     func chajeToutAnrejistreman() -> [AnrejistrePwen] {
-        rekiperetTout()
-    }
-
-    func rekiperetTout() -> [AnrejistrePwen] {
-        stockaj.rekipere(kle: kleAnrejistreman) ?? []
+        return rekiperetTout()
     }
 
     func jwennKlasmanPou(_ nivo: NivoJwe) -> [AnrejistrePwen] {
-        filtreParNivo(nivo)
-    }
-
-    func filtreParNivo(_ nivo: NivoJwe) -> [AnrejistrePwen] {
-        rekiperetTout()
-            .filter { $0.nivo == nivo && $0.pwen > 0 }
-            .sorted { $0.pwen > $1.pwen }
+        return filtreParNivo(nivo)
     }
 
     func ogmanteKontreSesyonSiyès() {
-        suiviKonsekirif.ogmante()
+        jeranKonsekirif.enkremante()
     }
 
     func reyinisilizeKontreSesyonSiyès() {
-        suiviKonsekirif.reyinisyalize()
+        jeranKonsekirif.reyinisyalize()
     }
 
     func jwennKontreSesyonSiyès() -> Int {
-        suiviKonsekirif.valèAktiyèl
+        return jeranKonsekirif.liValè()
     }
 
     func kalkilePwenBonus() -> Int {
-        kalkilatè.kalkile(kontrè: suiviKonsekirif.valèAktiyèl)
+        let kontrèAktiyèl = jwennKontreSesyonSiyès()
+        return motèKalkilBonus.kalkile(kontrè: kontrèAktiyèl)
+    }
+
+    func efaseToutDone() {
+        sistèmStockaj.efase(kle: kleData)
+        reyinisilizeKontreSesyonSiyès()
     }
 }
 
-// MARK: - Extensions for Codable
+// MARK: - Codable Conformance
 
 extension TipKatyo: Codable {}
 extension NivoJwe: Codable {}

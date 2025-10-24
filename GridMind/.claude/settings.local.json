@@ -11,7 +11,8 @@
       "Bash(xcodebuild:*)",
       "Bash(tee:*)",
       "Read(//private/tmp/**)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(tree:*)"
     ],
     "deny": [],
     "ask": []

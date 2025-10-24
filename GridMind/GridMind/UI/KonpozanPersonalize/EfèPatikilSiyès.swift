@@ -15,34 +15,49 @@ struct KonfigiraskonPatikil {
     let dire: CGFloat
     let echèl: CGFloat
 
-    static let defaut: [KonfigiraskonPatikil] = [
-        .init(koulè: .init(red: 1.0, green: 0.8, blue: 0.0, alpha: 1.0), vitès: 100, dire: 2.0, echèl: 0.5),
-        .init(koulè: .init(red: 1.0, green: 0.4, blue: 0.4, alpha: 1.0), vitès: 120, dire: 2.5, echèl: 0.6),
-        .init(koulè: .init(red: 0.4, green: 0.8, blue: 1.0, alpha: 1.0), vitès: 110, dire: 1.8, echèl: 0.55)
-    ]
+    static var defaut: [KonfigiraskonPatikil] {
+        return [
+            kreyeKonfig(wouj: 1.0, vèt: 0.8, ble: 0.0, vitès: 100, dire: 2.0, echèl: 0.5),
+            kreyeKonfig(wouj: 1.0, vèt: 0.4, ble: 0.4, vitès: 120, dire: 2.5, echèl: 0.6),
+            kreyeKonfig(wouj: 0.4, vèt: 0.8, ble: 1.0, vitès: 110, dire: 1.8, echèl: 0.55)
+        ]
+    }
+
+    private static func kreyeKonfig(wouj: CGFloat, vèt: CGFloat, ble: CGFloat, vitès: CGFloat, dire: CGFloat, echèl: CGFloat) -> KonfigiraskonPatikil {
+        return KonfigiraskonPatikil(
+            koulè: UIColor(red: wouj, green: vèt, blue: ble, alpha: 1.0),
+            vitès: vitès,
+            dire: dire,
+            echèl: echèl
+        )
+    }
 }
 
-// MARK: - Particle Cell Factory Protocol
+// MARK: - Cell Factory Protocol
 
 fileprivate protocol FactorySelilPatikil {
     func kreeSelil(ak konfig: KonfigiraskonPatikil, imaj: UIImage) -> CAEmitterCell
 }
 
-fileprivate struct FactorySelilStandard: FactorySelilPatikil {
+// MARK: - Standard Cell Factory
+
+fileprivate struct KreyatèSelilStandard: FactorySelilPatikil {
     func kreeSelil(ak konfig: KonfigiraskonPatikil, imaj: UIImage) -> CAEmitterCell {
         let selil = CAEmitterCell()
+
         selil.birthRate = 20.0
         selil.lifetime = 2.0
         selil.lifetimeRange = 0.5
         selil.velocity = konfig.vitès
         selil.velocityRange = 50.0
-        selil.emissionRange = .pi * 2
+        selil.emissionRange = CGFloat.pi * 2
         selil.spin = konfig.dire
         selil.spinRange = 3.0
         selil.scaleRange = konfig.echèl
         selil.scaleSpeed = -0.1
         selil.contents = imaj.cgImage
         selil.color = konfig.koulè.cgColor
+
         return selil
     }
 }
@@ -53,42 +68,66 @@ fileprivate protocol JeneratèFòm {
     func kreeImaj(ak koulè: UIColor, gwosè: CGFloat) -> UIImage
 }
 
-fileprivate struct JeneratèEtwal: JeneratèFòm {
+// MARK: - Star Shape Generator
+
+fileprivate struct ProdiktèEtwal: JeneratèFòm {
     func kreeImaj(ak koulè: UIColor, gwosè: CGFloat) -> UIImage {
-        let rektang = CGRect(origin: .zero, size: .init(width: gwosè, height: gwosè))
-        UIGraphicsBeginImageContextWithOptions(rektang.size, false, 0)
+        let dimansyon = CGSize(width: gwosè, height: gwosè)
+        let rektang = CGRect(origin: CGPoint.zero, size: dimansyon)
+
+        UIGraphicsBeginImageContextWithOptions(dimansyon, false, 0)
         defer { UIGraphicsEndImageContext() }
 
-        guard let ctx = UIGraphicsGetCurrentContext() else { return UIImage() }
+        guard let konteks = UIGraphicsGetCurrentContext() else {
+            return UIImage()
+        }
 
-        ctx.setFillColor(koulè.cgColor)
-        desineEtwal(nan: ctx, santè: .init(x: gwosè / 2, y: gwosè / 2), rayon: gwosè / 2)
+        konteks.setFillColor(koulè.cgColor)
 
-        return UIGraphicsGetImageFromCurrentImageContext() ?? UIImage()
+        let santral = CGPoint(x: gwosè / 2, y: gwosè / 2)
+        let rayon = gwosè / 2
+        desineEtwalDans(konteks: konteks, santè: santral, rayon: rayon)
+
+        guard let imajFinal = UIGraphicsGetImageFromCurrentImageContext() else {
+            return UIImage()
+        }
+
+        return imajFinal
     }
 
-    private func desineEtwal(nan ctx: CGContext, santè: CGPoint, rayon: CGFloat) {
-        var eksterye: [CGPoint] = []
-        var entèn: [CGPoint] = []
+    private func desineEtwalDans(konteks: CGContext, santè: CGPoint, rayon: CGFloat) {
+        var pwenEksteryè: [CGPoint] = []
+        var pwenEnteryè: [CGFloat] = []
 
         for i in 0..<5 {
-            let ang = CGFloat(i) * .pi * 2 / 5 - .pi / 2
-            eksterye.append(.init(x: santè.x + rayon * cos(ang), y: santè.y + rayon * sin(ang)))
+            let ang = CGFloat(i) * CGFloat.pi * 2 / 5 - CGFloat.pi / 2
+            let x = santè.x + rayon * cos(ang)
+            let y = santè.y + rayon * sin(ang)
+            pwenEksteryè.append(CGPoint(x: x, y: y))
         }
 
+        var pwenEntèn: [CGPoint] = []
         for i in 0..<5 {
-            let ang = CGFloat(i) * .pi * 2 / 5 - .pi / 2 + .pi / 5
-            entèn.append(.init(x: santè.x + rayon * 0.4 * cos(ang), y: santè.y + rayon * 0.4 * sin(ang)))
+            let angDekale = CGFloat(i) * CGFloat.pi * 2 / 5 - CGFloat.pi / 2 + CGFloat.pi / 5
+            let rayonEntèn = rayon * 0.4
+            let x = santè.x + rayonEntèn * cos(angDekale)
+            let y = santè.y + rayonEntèn * sin(angDekale)
+            pwenEntèn.append(CGPoint(x: x, y: y))
         }
 
-        ctx.beginPath()
+        konteks.beginPath()
+
         for i in 0..<5 {
-            if i == 0 { ctx.move(to: eksterye[i]) }
-            else { ctx.addLine(to: eksterye[i]) }
-            ctx.addLine(to: entèn[i])
+            if i == 0 {
+                konteks.move(to: pwenEksteryè[i])
+            } else {
+                konteks.addLine(to: pwenEksteryè[i])
+            }
+            konteks.addLine(to: pwenEntèn[i])
         }
-        ctx.closePath()
-        ctx.fillPath()
+
+        konteks.closePath()
+        konteks.fillPath()
     }
 }
 
@@ -96,11 +135,13 @@ fileprivate struct JeneratèEtwal: JeneratèFòm {
 
 class EfèPatikilSiyès: UIView {
 
-    private var emèterPatikil: CAEmitterLayer?
-    private let factorySelil: FactorySelilPatikil = FactorySelilStandard()
-    private let jeneratèFòm: JeneratèFòm = JeneratèEtwal()
+    private var koleksyonEmèter: [CAEmitterLayer] = []
+    private let fabrikSelil: FactorySelilPatikil
+    private let prodiktèFòm: JeneratèFòm
 
     override init(frame: CGRect) {
+        self.fabrikSelil = KreyatèSelilStandard()
+        self.prodiktèFòm = ProdiktèEtwal()
         super.init(frame: frame)
         isUserInteractionEnabled = false
     }
@@ -110,31 +151,40 @@ class EfèPatikilSiyès: UIView {
     }
 
     func kòmanseEfèSiyès(nan pozisyon: CGPoint) {
-        let emèter = kreeEmèter(pozisyon: pozisyon)
-        let selils = KonfigiraskonPatikil.defaut.map { konfig in
-            let imaj = jeneratèFòm.kreeImaj(ak: konfig.koulè, gwosè: 20)
-            return factorySelil.kreeSelil(ak: konfig, imaj: imaj)
+        let nouvoEmèter = fabrikeEmèter(pozisyon: pozisyon)
+
+        var listaSelil: [CAEmitterCell] = []
+        for konfig in KonfigiraskonPatikil.defaut {
+            let imaj = prodiktèFòm.kreeImaj(ak: konfig.koulè, gwosè: 20)
+            let selil = fabrikSelil.kreeSelil(ak: konfig, imaj: imaj)
+            listaSelil.append(selil)
         }
 
-        emèter.emitterCells = selils
-        layer.addSublayer(emèter)
-        self.emèterPatikil = emèter
+        nouvoEmèter.emitterCells = listaSelil
+        layer.addSublayer(nouvoEmèter)
+        koleksyonEmèter.append(nouvoEmèter)
 
-        programeArete(emèter)
+        programeArete(emèter: nouvoEmèter)
     }
 
     func kòmanseEfèSelebrasyon() {
-        let dimansyon = (lajè: bounds.width, otè: bounds.height)
-        let pozisyons = (0..<5).map { _ in
-            CGPoint(
-                x: .random(in: dimansyon.lajè * 0.2...dimansyon.lajè * 0.8),
-                y: .random(in: dimansyon.otè * 0.3...dimansyon.otè * 0.7)
-            )
+        let lajèEkran = bounds.width
+        let otèEkran = bounds.height
+
+        var listPozisyon: [CGPoint] = []
+
+        for _ in 0..<5 {
+            let x = CGFloat.random(in: lajèEkran * 0.2...lajèEkran * 0.8)
+            let y = CGFloat.random(in: otèEkran * 0.3...otèEkran * 0.7)
+            listPozisyon.append(CGPoint(x: x, y: y))
         }
-        pozisyons.forEach { kòmanseEfèSiyès(nan: $0) }
+
+        for poz in listPozisyon {
+            kòmanseEfèSiyès(nan: poz)
+        }
     }
 
-    private func kreeEmèter(pozisyon: CGPoint) -> CAEmitterLayer {
+    private func fabrikeEmèter(pozisyon: CGPoint) -> CAEmitterLayer {
         let emèter = CAEmitterLayer()
         emèter.emitterPosition = pozisyon
         emèter.emitterShape = .circle
@@ -143,20 +193,25 @@ class EfèPatikilSiyès: UIView {
         return emèter
     }
 
-    private func programeArete(_ emèter: CAEmitterLayer) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak emèter] in
-            emèter?.birthRate = 0
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                emèter?.removeFromSuperlayer()
+    private func programeArete(emèter: CAEmitterLayer) {
+        let delè1: TimeInterval = 1.5
+        let delè2: TimeInterval = 2.0
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + delè1) { [weak emèter] in
+            guard let emèterReyèl = emèter else { return }
+            emèterReyèl.birthRate = 0
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + delè2) {
+                emèterReyèl.removeFromSuperlayer()
             }
         }
     }
 
     func rete() {
-        [emèterPatikil].compactMap { $0 }.forEach {
-            $0.birthRate = 0
-            $0.removeFromSuperlayer()
+        for emèter in koleksyonEmèter {
+            emèter.birthRate = 0
+            emèter.removeFromSuperlayer()
         }
-        emèterPatikil = nil
+        koleksyonEmèter.removeAll()
     }
 }

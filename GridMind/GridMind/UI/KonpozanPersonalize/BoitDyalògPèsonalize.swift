@@ -7,7 +7,7 @@
 
 import UIKit
 
-// MARK: - Dialog Configuration
+// MARK: - Dialog Data Model
 
 struct KonfigiraskonDyalòg {
     let tikèt: String
@@ -21,34 +21,43 @@ struct KonfigiraskonDyalòg {
     }
 }
 
-// MARK: - Dialog Builder
+// MARK: - Builder Pattern
 
 class KonstryiktèDyalòg {
-    private var tikèt: String = ""
-    private var mesaj: String = ""
-    private var boutons: [KonfigiraskonDyalòg.KonfigiraskonBoutonDyalòg] = []
+    private var nonTikèt: String = ""
+    private var tèksMesaj: String = ""
+    private var listeBouton: [KonfigiraskonDyalòg.KonfigiraskonBoutonDyalòg] = []
 
     func avèkTikèt(_ tikèt: String) -> Self {
-        self.tikèt = tikèt
+        self.nonTikèt = tikèt
         return self
     }
 
     func avèkMesaj(_ mesaj: String) -> Self {
-        self.mesaj = mesaj
+        self.tèksMesaj = mesaj
         return self
     }
 
     func ajouteBouton(tèks: String, koulè: UIColor, aksyon: @escaping () -> Void) -> Self {
-        boutons.append(.init(tèks: tèks, koulè: koulè, aksyon: aksyon))
+        let konfig = KonfigiraskonDyalòg.KonfigiraskonBoutonDyalòg(
+            tèks: tèks,
+            koulè: koulè,
+            aksyon: aksyon
+        )
+        listeBouton.append(konfig)
         return self
     }
 
     func konstryi() -> KonfigiraskonDyalòg {
-        .init(tikèt: tikèt, mesaj: mesaj, boutons: boutons)
+        return KonfigiraskonDyalòg(
+            tikèt: nonTikèt,
+            mesaj: tèksMesaj,
+            boutons: listeBouton
+        )
     }
 }
 
-// MARK: - View Factory for Dialog Components
+// MARK: - Component Factory Protocol
 
 fileprivate protocol FactoryKonpozanDyalòg {
     func kreeKontènè() -> UIView
@@ -57,22 +66,27 @@ fileprivate protocol FactoryKonpozanDyalòg {
     func kreeStackBouton() -> UIStackView
 }
 
-fileprivate struct FactoryStandardDyalòg: FactoryKonpozanDyalòg {
+// MARK: - Standard Factory Implementation
+
+fileprivate struct ImplemantasyonFactoryStandard: FactoryKonpozanDyalòg {
     func kreeKontènè() -> UIView {
-        let vi = UIView()
-        vi.backgroundColor = .white
-        vi.layer.cornerRadius = 24
-        vi.layer.shadowColor = UIColor.black.cgColor
-        vi.layer.shadowOffset = CGSize(width: 0, height: 10)
-        vi.layer.shadowOpacity = 0.3
-        vi.layer.shadowRadius = 20
-        vi.translatesAutoresizingMaskIntoConstraints = false
-        return vi
+        let kontenèPrènsipal = UIView()
+        kontenèPrènsipal.backgroundColor = UIColor(white: 1.0, alpha: 1.0)
+        kontenèPrènsipal.layer.cornerRadius = 24
+        kontenèPrènsipal.translatesAutoresizingMaskIntoConstraints = false
+
+        let propryeteLonm = kontenèPrènsipal.layer
+        propryeteLonm.shadowColor = UIColor.black.cgColor
+        propryeteLonm.shadowOffset = CGSize(width: 0, height: 10)
+        propryeteLonm.shadowOpacity = 0.3
+        propryeteLonm.shadowRadius = 20
+
+        return kontenèPrènsipal
     }
 
     func kreeTikèt() -> UILabel {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 28, weight: .bold)
+        label.font = UIFont.systemFont(ofSize: 28, weight: .bold)
         label.textAlignment = .center
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -80,206 +94,225 @@ fileprivate struct FactoryStandardDyalòg: FactoryKonpozanDyalòg {
     }
 
     func kreeMesaj() -> UILabel {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 16, weight: .regular)
-        label.textAlignment = .center
-        label.numberOfLines = 0
-        label.textColor = .darkGray
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
+        let tèks = UILabel()
+        tèks.font = UIFont.systemFont(ofSize: 16, weight: .regular)
+        tèks.textAlignment = .center
+        tèks.numberOfLines = 0
+        tèks.textColor = UIColor.darkGray
+        tèks.translatesAutoresizingMaskIntoConstraints = false
+        return tèks
     }
 
     func kreeStackBouton() -> UIStackView {
-        let stack = UIStackView()
-        stack.axis = .horizontal
-        stack.distribution = .fillEqually
-        stack.spacing = 12
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        return stack
+        let pilaj = UIStackView()
+        pilaj.axis = .horizontal
+        pilaj.distribution = .fillEqually
+        pilaj.spacing = 12
+        pilaj.translatesAutoresizingMaskIntoConstraints = false
+        return pilaj
     }
 }
 
-// MARK: - Main Dialog View
+// MARK: - Custom Dialog View
 
 class BoitDyalògPèsonalize: UIView {
 
-    private let factory: FactoryKonpozanDyalòg = FactoryStandardDyalòg()
-    private lazy var kontènèVi = factory.kreeKontènè()
-    private lazy var tikèt = factory.kreeTikèt()
-    private lazy var mesaj = factory.kreeMesaj()
-    private lazy var boutonPila = factory.kreeStackBouton()
-    private var aksyonBouton: [() -> Void] = []
+    private let fabrikKompozan: FactoryKonpozanDyalòg
+    private lazy var vizyelKontenè = fabrikKompozan.kreeKontènè()
+    private lazy var labelTikèt = fabrikKompozan.kreeTikèt()
+    private lazy var labelMesaj = fabrikKompozan.kreeMesaj()
+    private lazy var stakBouton = fabrikKompozan.kreeStackBouton()
+    private var reponsBouton: [() -> Void] = []
 
-    // MARK: - Initialization
     override init(frame: CGRect) {
+        self.fabrikKompozan = ImplemantasyonFactoryStandard()
         super.init(frame: frame)
-        konfigireUI()
+        preparUI()
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    // MARK: - UI Configuration
-    private func konfigireUI() {
-        backgroundColor = UIColor.black.withAlphaComponent(0.6)
+    private func preparUI() {
+        let koulèFon = UIColor.black.withAlphaComponent(0.6)
+        backgroundColor = koulèFon
         alpha = 0
 
-        addSubview(kontènèVi)
-        kontènèVi.addSubview(tikèt)
-        kontènèVi.addSubview(mesaj)
-        kontènèVi.addSubview(boutonPila)
+        addSubview(vizyelKontenè)
+        vizyelKontenè.addSubview(labelTikèt)
+        vizyelKontenè.addSubview(labelMesaj)
+        vizyelKontenè.addSubview(stakBouton)
 
-        NSLayoutConstraint.activate([
-            kontènèVi.centerXAnchor.constraint(equalTo: centerXAnchor),
-            kontènèVi.centerYAnchor.constraint(equalTo: centerYAnchor),
-            kontènèVi.widthAnchor.constraint(equalToConstant: 300),
-            kontènèVi.heightAnchor.constraint(greaterThanOrEqualToConstant: 200),
+        let kontrèntKontenè = [
+            vizyelKontenè.centerXAnchor.constraint(equalTo: centerXAnchor),
+            vizyelKontenè.centerYAnchor.constraint(equalTo: centerYAnchor),
+            vizyelKontenè.widthAnchor.constraint(equalToConstant: 300),
+            vizyelKontenè.heightAnchor.constraint(greaterThanOrEqualToConstant: 200)
+        ]
 
-            tikèt.topAnchor.constraint(equalTo: kontènèVi.topAnchor, constant: 30),
-            tikèt.leadingAnchor.constraint(equalTo: kontènèVi.leadingAnchor, constant: 20),
-            tikèt.trailingAnchor.constraint(equalTo: kontènèVi.trailingAnchor, constant: -20),
+        let kontrèntTikèt = [
+            labelTikèt.topAnchor.constraint(equalTo: vizyelKontenè.topAnchor, constant: 30),
+            labelTikèt.leadingAnchor.constraint(equalTo: vizyelKontenè.leadingAnchor, constant: 20),
+            labelTikèt.trailingAnchor.constraint(equalTo: vizyelKontenè.trailingAnchor, constant: -20)
+        ]
 
-            mesaj.topAnchor.constraint(equalTo: tikèt.bottomAnchor, constant: 16),
-            mesaj.leadingAnchor.constraint(equalTo: kontènèVi.leadingAnchor, constant: 20),
-            mesaj.trailingAnchor.constraint(equalTo: kontènèVi.trailingAnchor, constant: -20),
+        let kontrèntMesaj = [
+            labelMesaj.topAnchor.constraint(equalTo: labelTikèt.bottomAnchor, constant: 16),
+            labelMesaj.leadingAnchor.constraint(equalTo: vizyelKontenè.leadingAnchor, constant: 20),
+            labelMesaj.trailingAnchor.constraint(equalTo: vizyelKontenè.trailingAnchor, constant: -20)
+        ]
 
-            boutonPila.topAnchor.constraint(equalTo: mesaj.bottomAnchor, constant: 30),
-            boutonPila.leadingAnchor.constraint(equalTo: kontènèVi.leadingAnchor, constant: 20),
-            boutonPila.trailingAnchor.constraint(equalTo: kontènèVi.trailingAnchor, constant: -20),
-            boutonPila.bottomAnchor.constraint(equalTo: kontènèVi.bottomAnchor, constant: -20),
-            boutonPila.heightAnchor.constraint(equalToConstant: 50)
-        ])
+        let kontrèntBouton = [
+            stakBouton.topAnchor.constraint(equalTo: labelMesaj.bottomAnchor, constant: 30),
+            stakBouton.leadingAnchor.constraint(equalTo: vizyelKontenè.leadingAnchor, constant: 20),
+            stakBouton.trailingAnchor.constraint(equalTo: vizyelKontenè.trailingAnchor, constant: -20),
+            stakBouton.bottomAnchor.constraint(equalTo: vizyelKontenè.bottomAnchor, constant: -20),
+            stakBouton.heightAnchor.constraint(equalToConstant: 50)
+        ]
+
+        NSLayoutConstraint.activate(kontrèntKontenè + kontrèntTikèt + kontrèntMesaj + kontrèntBouton)
     }
 
     func konfigure(tikèt: String, mesaj: String, bouton: [(tèks: String, koulè: UIColor, aksyon: () -> Void)]) {
-        let konfig = KonfigiraskonDyalòg(
+        let listKonfig = bouton.map { elem in
+            KonfigiraskonDyalòg.KonfigiraskonBoutonDyalòg(
+                tèks: elem.tèks,
+                koulè: elem.koulè,
+                aksyon: elem.aksyon
+            )
+        }
+
+        let konfigTotal = KonfigiraskonDyalòg(
             tikèt: tikèt,
             mesaj: mesaj,
-            boutons: bouton.map { .init(tèks: $0.tèks, koulè: $0.koulè, aksyon: $0.aksyon) }
+            boutons: listKonfig
         )
-        aplikeKonfigirasyon(konfig)
+
+        aplikeKonfigirasyon(konfigTotal)
     }
 
     private func aplikeKonfigirasyon(_ konfig: KonfigiraskonDyalòg) {
-        tikèt.text = konfig.tikèt
-        mesaj.text = konfig.mesaj
-        boutonPila.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        aksyonBouton = konfig.boutons.map { $0.aksyon }
+        labelTikèt.text = konfig.tikèt
+        labelMesaj.text = konfig.mesaj
 
-        konfig.boutons.enumerated().forEach { idx, btnKonfig in
-            let btn = kreyeBouton(avèk: btnKonfig, tag: idx)
-            boutonPila.addArrangedSubview(btn)
+        stakBouton.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        reponsBouton = konfig.boutons.map { $0.aksyon }
+
+        for (idx, konfiBouton) in konfig.boutons.enumerated() {
+            let btn = konstruBouton(avèk: konfiBouton, tag: idx)
+            stakBouton.addArrangedSubview(btn)
         }
     }
 
-    private func kreyeBouton(
-        avèk konfig: KonfigiraskonDyalòg.KonfigiraskonBoutonDyalòg,
-        tag: Int
-    ) -> UIButton {
-        let btn = UIButton(type: .system)
-        let aksyons: [(Selector, UIControl.Event)] = [
-            (#selector(boutonTape(_:)), .touchUpInside),
-            (#selector(boutonPreseAnba(_:)), .touchDown),
-            (#selector(boutonLage(_:)), [.touchUpInside, .touchUpOutside])
-        ]
+    private func konstruBouton(avèk konfig: KonfigiraskonDyalòg.KonfigiraskonBoutonDyalòg, tag: Int) -> UIButton {
+        let bouton = UIButton(type: .system)
 
-        btn.setTitle(konfig.tèks, for: .normal)
-        btn.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
-        btn.backgroundColor = konfig.koulè
-        btn.setTitleColor(.white, for: .normal)
-        btn.layer.cornerRadius = 12
-        btn.tag = tag
+        bouton.setTitle(konfig.tèks, for: .normal)
+        bouton.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
+        bouton.backgroundColor = konfig.koulè
+        bouton.setTitleColor(UIColor.white, for: .normal)
+        bouton.layer.cornerRadius = 12
+        bouton.tag = tag
 
-        aksyons.forEach { btn.addTarget(self, action: $0.0, for: $0.1) }
+        bouton.addTarget(self, action: #selector(jereKlikBouton(_:)), for: .touchUpInside)
+        bouton.addTarget(self, action: #selector(jerePresBouton(_:)), for: .touchDown)
+        bouton.addTarget(self, action: #selector(jereRelasBouton(_:)), for: [.touchUpInside, .touchUpOutside])
 
-        return btn
+        return bouton
     }
 
-    // MARK: - Actions
-    @objc private func boutonTape(_ bouton: UIButton) {
-        if bouton.tag < aksyonBouton.count {
-            aksyonBouton[bouton.tag]()
+    @objc private func jereKlikBouton(_ bouton: UIButton) {
+        let tagBouton = bouton.tag
+        if tagBouton >= 0 && tagBouton < reponsBouton.count {
+            reponsBouton[tagBouton]()
         }
         kache()
     }
 
-    @objc private func boutonPreseAnba(_ bouton: UIButton) {
+    @objc private func jerePresBouton(_ bouton: UIButton) {
         UIView.animate(withDuration: 0.1) {
             bouton.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
         }
     }
 
-    @objc private func boutonLage(_ bouton: UIButton) {
+    @objc private func jereRelasBouton(_ bouton: UIButton) {
         UIView.animate(withDuration: 0.1) {
-            bouton.transform = .identity
+            bouton.transform = CGAffineTransform.identity
         }
     }
 
-    // MARK: - Show/Hide
     func afiche(nan vi: UIView) {
         vi.addSubview(self)
         self.frame = vi.bounds
 
-        kontènèVi.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+        let transformInisyal = CGAffineTransform(scaleX: 0.8, y: 0.8)
+        vizyelKontenè.transform = transformInisyal
 
-        UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.5, options: .curveEaseOut) {
-            self.alpha = 1
-            self.kontènèVi.transform = .identity
-        }
+        UIView.animate(
+            withDuration: 0.3,
+            delay: 0,
+            usingSpringWithDamping: 0.7,
+            initialSpringVelocity: 0.5,
+            options: .curveEaseOut,
+            animations: {
+                self.alpha = 1
+                self.vizyelKontenè.transform = CGAffineTransform.identity
+            },
+            completion: nil
+        )
     }
 
     func kache() {
-        UIView.animate(withDuration: 0.2, animations: {
-            self.alpha = 0
-            self.kontènèVi.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
-        }) { _ in
-            self.removeFromSuperview()
-        }
+        let transformFinal = CGAffineTransform(scaleX: 0.8, y: 0.8)
+
+        UIView.animate(
+            withDuration: 0.2,
+            animations: {
+                self.alpha = 0
+                self.vizyelKontenè.transform = transformFinal
+            },
+            completion: { _ in
+                self.removeFromSuperview()
+            }
+        )
     }
 }
 
-// MARK: - Convenience Factory Methods
+// MARK: - Factory Helper Methods
 
 extension BoitDyalògPèsonalize {
-    static func aficheSiyès(
-        nan vi: UIView,
-        mesaj: String,
-        pwen: Int? = nil,
-        akerebouton: @escaping () -> Void
-    ) {
-        let mesajKonplè = pwen.map { mesaj + "\n\n🎉 +\($0) points" } ?? mesaj
+    static func aficheSiyès(nan vi: UIView, mesaj: String, pwen: Int? = nil, akerebouton: @escaping () -> Void) {
+        var mesajFinal = mesaj
+        if let skorPwen = pwen {
+            mesajFinal = "\(mesaj)\n\n🎉 +\(skorPwen) points"
+        }
+
         let konfig = KonstryiktèDyalòg()
             .avèkTikèt("🎊 Success!")
-            .avèkMesaj(mesajKonplè)
+            .avèkMesaj(mesajFinal)
             .ajouteBouton(
                 tèks: "Continue",
-                koulè: .init(red: 0.2, green: 0.7, blue: 0.5, alpha: 1.0),
+                koulè: UIColor(red: 0.2, green: 0.7, blue: 0.5, alpha: 1.0),
                 aksyon: akerebouton
             )
             .konstryi()
 
-        let dyalòg = kreyeEAfiche(konfig: konfig, nan: vi)
-        _ = dyalòg
+        kreyeEAficheAvèkKonfig(konfig, nan: vi)
     }
 
-    static func aficheEchèk(
-        nan vi: UIView,
-        mesaj: String,
-        reeseyeAksyon: @escaping () -> Void
-    ) {
+    static func aficheEchèk(nan vi: UIView, mesaj: String, reeseyeAksyon: @escaping () -> Void) {
         let konfig = KonstryiktèDyalòg()
             .avèkTikèt("😔 Game Over")
             .avèkMesaj(mesaj)
             .ajouteBouton(
                 tèks: "Try Again",
-                koulè: .init(red: 0.9, green: 0.4, blue: 0.4, alpha: 1.0),
+                koulè: UIColor(red: 0.9, green: 0.4, blue: 0.4, alpha: 1.0),
                 aksyon: reeseyeAksyon
             )
             .konstryi()
 
-        let dyalòg = kreyeEAfiche(konfig: konfig, nan: vi)
-        _ = dyalòg
+        kreyeEAficheAvèkKonfig(konfig, nan: vi)
     }
 
     static func aficheKonfimmasyon(
@@ -292,25 +325,24 @@ extension BoitDyalògPèsonalize {
         let konfig = KonstryiktèDyalòg()
             .avèkTikèt(tikèt)
             .avèkMesaj(mesaj)
-            .ajouteBouton(tèks: "Cancel", koulè: .lightGray, aksyon: anileAksyon)
+            .ajouteBouton(
+                tèks: "Cancel",
+                koulè: UIColor.lightGray,
+                aksyon: anileAksyon
+            )
             .ajouteBouton(
                 tèks: "Confirm",
-                koulè: .init(red: 0.2, green: 0.5, blue: 0.8, alpha: 1.0),
+                koulè: UIColor(red: 0.2, green: 0.5, blue: 0.8, alpha: 1.0),
                 aksyon: konfimeAksyon
             )
             .konstryi()
 
-        let dyalòg = kreyeEAfiche(konfig: konfig, nan: vi)
-        _ = dyalòg
+        kreyeEAficheAvèkKonfig(konfig, nan: vi)
     }
 
-    private static func kreyeEAfiche(
-        konfig: KonfigiraskonDyalòg,
-        nan vi: UIView
-    ) -> BoitDyalògPèsonalize {
+    private static func kreyeEAficheAvèkKonfig(_ konfig: KonfigiraskonDyalòg, nan vi: UIView) {
         let dyalòg = BoitDyalògPèsonalize()
         dyalòg.aplikeKonfigirasyon(konfig)
         dyalòg.afiche(nan: vi)
-        return dyalòg
     }
 }
