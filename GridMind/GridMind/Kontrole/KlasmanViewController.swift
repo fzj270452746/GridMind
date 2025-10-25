@@ -20,7 +20,8 @@ class KlasmanViewController: UIViewController {
 
     private let tablVi: UITableView = {
         let tablVi = UITableView(frame: .zero, style: .insetGrouped)
-        tablVi.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1.0)
+        tablVi.backgroundColor = .clear
+        tablVi.separatorStyle = .none
         tablVi.translatesAutoresizingMaskIntoConstraints = false
         return tablVi
     }()
@@ -36,8 +37,8 @@ class KlasmanViewController: UIViewController {
         etikèt.text = "🏆\n\nNo scores yet!\nPlay games to see your scores here."
         etikèt.numberOfLines = 0
         etikèt.textAlignment = .center
-        etikèt.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        etikèt.textColor = .gray
+        etikèt.font = DesignTypography.body
+        etikèt.textColor = UIColor.white.withAlphaComponent(0.85)
         etikèt.translatesAutoresizingMaskIntoConstraints = false
         return etikèt
     }()
@@ -56,16 +57,34 @@ class KlasmanViewController: UIViewController {
         super.viewWillAppear(animated)
         charjeAnrejistreman()
     }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        // Update background gradient frame
+        DynamicBackgroundFactory.updateBackgroundFrame(for: view)
+    }
 
     // MARK: - UI Configuration
     private func konfigireUI() {
         title = "Leaderboard"
-        view.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1.0)
+        
+        // Add dynamic animated background
+        DynamicBackgroundFactory.createAnimatedBackground(for: view)
+        
         navigationController?.setNavigationBarHidden(false, animated: true)
 
         // Configure navigation bar
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.navigationBar.tintColor = UIColor(red: 0.2, green: 0.5, blue: 0.8, alpha: 1.0)
+        navigationController?.navigationBar.tintColor = DesignColors.primaryGradientStart
+        
+        // Make navigation bar transparent
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithTransparentBackground()
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
 
         view.addSubview(segmanteKontwòl)
         view.addSubview(tablVi)
@@ -151,19 +170,21 @@ class PwenTableViewCell: UITableViewCell {
 
     private let kontènèVi: UIView = {
         let vi = UIView()
-        vi.backgroundColor = .white
-        vi.layer.cornerRadius = 12
-        vi.layer.shadowColor = UIColor.black.cgColor
-        vi.layer.shadowOffset = CGSize(width: 0, height: 2)
-        vi.layer.shadowOpacity = 0.1
-        vi.layer.shadowRadius = 4
+        vi.backgroundColor = UIColor(white: 1.0, alpha: 0.98)
+        vi.layer.cornerRadius = DesignRadius.medium
+        vi.layer.applyShadow(.medium)
         vi.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Add subtle border
+        vi.layer.borderWidth = 1.0
+        vi.layer.borderColor = UIColor(white: 1.0, alpha: 0.3).cgColor
+        
         return vi
     }()
 
     private let etikètRan: UILabel = {
         let etikèt = UILabel()
-        etikèt.font = UIFont.systemFont(ofSize: 24, weight: .bold)
+        etikèt.font = DesignTypography.title2
         etikèt.textAlignment = .center
         etikèt.translatesAutoresizingMaskIntoConstraints = false
         return etikèt
@@ -171,16 +192,16 @@ class PwenTableViewCell: UITableViewCell {
 
     private let etikètPwen: UILabel = {
         let etikèt = UILabel()
-        etikèt.font = UIFont.systemFont(ofSize: 28, weight: .bold)
-        etikèt.textColor = UIColor(red: 0.2, green: 0.5, blue: 0.8, alpha: 1.0)
+        etikèt.font = UIFont.systemFont(ofSize: 32, weight: .black)
+        etikèt.textColor = DesignColors.primaryGradientStart
         etikèt.translatesAutoresizingMaskIntoConstraints = false
         return etikèt
     }()
 
     private let etikètDat: UILabel = {
         let etikèt = UILabel()
-        etikèt.font = UIFont.systemFont(ofSize: 13, weight: .regular)
-        etikèt.textColor = .gray
+        etikèt.font = DesignTypography.caption
+        etikèt.textColor = DesignColors.textSecondary
         etikèt.translatesAutoresizingMaskIntoConstraints = false
         return etikèt
     }()
@@ -234,10 +255,32 @@ class PwenTableViewCell: UITableViewCell {
         etikètPwen.text = "\(anrejistreman.pwen)"
         etikètDat.text = anrejistreman.datAfiche
 
+        // Apply gradient for top 3
         if ran <= 3 {
-            kontènèVi.backgroundColor = UIColor(red: 1.0, green: 0.98, blue: 0.9, alpha: 1.0)
+            let gradientLayer = CAGradientLayer()
+            let baseColor: UIColor
+            
+            switch ran {
+            case 1: baseColor = DesignColors.warningGradientStart
+            case 2: baseColor = UIColor(red: 0.75, green: 0.75, blue: 0.75, alpha: 1.0)
+            case 3: baseColor = UIColor(red: 0.80, green: 0.50, blue: 0.20, alpha: 1.0)
+            default: baseColor = .white
+            }
+            
+            gradientLayer.colors = [
+                baseColor.withAlphaComponent(0.15).cgColor,
+                baseColor.withAlphaComponent(0.05).cgColor
+            ]
+            gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
+            gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
+            gradientLayer.cornerRadius = DesignRadius.medium
+            gradientLayer.frame = kontènèVi.bounds
+            
+            // Remove old gradient if exists
+            kontènèVi.layer.sublayers?.first(where: { $0 is CAGradientLayer })?.removeFromSuperlayer()
+            kontènèVi.layer.insertSublayer(gradientLayer, at: 0)
         } else {
-            kontènèVi.backgroundColor = .white
+            kontènèVi.layer.sublayers?.first(where: { $0 is CAGradientLayer })?.removeFromSuperlayer()
         }
     }
 }

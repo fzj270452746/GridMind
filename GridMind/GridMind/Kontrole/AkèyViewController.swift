@@ -74,23 +74,27 @@ fileprivate struct FabrikViStandard: FactoryVi {
     func kreeTitl() -> UILabel {
         let etikèt = UILabel()
         etikèt.text = "Mahjong\nGrid Mind"
-        etikèt.font = UIFont.systemFont(ofSize: 48, weight: .black)
+        etikèt.font = DesignTypography.largeTitle
         etikèt.textAlignment = .center
         etikèt.numberOfLines = 0
         etikèt.translatesAutoresizingMaskIntoConstraints = false
-
-        let koulèTèks = UIColor(red: 0.15, green: 0.15, blue: 0.15, alpha: 1.0)
-        etikèt.textColor = koulèTèks
+        etikèt.textColor = .white
+        
+        // Add shadow for better visibility on dark background
+        etikèt.layer.shadowColor = UIColor.black.cgColor
+        etikèt.layer.shadowOffset = CGSize(width: 0, height: 2)
+        etikèt.layer.shadowOpacity = 0.3
+        etikèt.layer.shadowRadius = 4
 
         return etikèt
     }
 
     func kreeSutitl() -> UILabel {
         let deskripsyon = UILabel()
-        deskripsyon.text = "Test Your Memory"
-        deskripsyon.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        deskripsyon.text = "🀄️ Test Your Memory"
+        deskripsyon.font = DesignTypography.body
         deskripsyon.textAlignment = .center
-        deskripsyon.textColor = UIColor.gray
+        deskripsyon.textColor = UIColor.white.withAlphaComponent(0.85)
         deskripsyon.translatesAutoresizingMaskIntoConstraints = false
         return deskripsyon
     }
@@ -119,25 +123,37 @@ fileprivate class KonstryiktèBouton {
         definiAparans()
         ajouteKontni()
         konnekteAksyon()
+        
+        // Schedule layout update for gradient layer
+        DispatchQueue.main.async {
+            self.updateGradientFrame()
+        }
+        
         return elemBouton
+    }
+    
+    private func updateGradientFrame() {
+        if let gradientLayer = elemBouton.layer.value(forKey: "gradientLayer") as? CAGradientLayer {
+            gradientLayer.frame = elemBouton.bounds
+        }
     }
 
     private func definiAparans() {
-        elemBouton.backgroundColor = parametKonfig.koulè
+        // Use gradient instead of solid color
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.colors = [parametKonfig.koulè.cgColor, parametKonfig.koulè.darker().cgColor]
+        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
+        gradientLayer.endPoint = CGPoint(x: 1, y: 1)
+        gradientLayer.cornerRadius = parametKonfig.rayonKwen
+        elemBouton.layer.insertSublayer(gradientLayer, at: 0)
+        
+        // Apply modern shadow
+        let shadow: DesignShadow = (parametKonfig.otè == 80) ? .large : .medium
+        elemBouton.layer.applyShadow(shadow)
         elemBouton.layer.cornerRadius = parametKonfig.rayonKwen
-
-        let longbè = elemBouton.layer
-        longbè.shadowColor = UIColor.black.cgColor
-
-        if parametKonfig.otè == 80 {
-            longbè.shadowOffset = CGSize(width: 0, height: 4)
-            longbè.shadowOpacity = 0.15
-            longbè.shadowRadius = 8
-        } else {
-            longbè.shadowOffset = CGSize(width: 0, height: 3)
-            longbè.shadowOpacity = 0.12
-            longbè.shadowRadius = 6
-        }
+        
+        // Store gradient layer for later frame updates
+        elemBouton.layer.setValue(gradientLayer, forKey: "gradientLayer")
     }
 
     private func ajouteKontni() {
@@ -243,6 +259,25 @@ class AkèyViewController: UIViewController {
         let kontrolNav = navigationController
         kontrolNav?.setNavigationBarHidden(true, animated: animated)
     }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        // Update gradient layer frames for all buttons
+        updateButtonGradients()
+        
+        // Update background gradient frame
+        DynamicBackgroundFactory.updateBackgroundFrame(for: view)
+    }
+    
+    private func updateButtonGradients() {
+        let buttons = [boutonNivoFasil, boutonNivoMwayen, boutonNivoDifisil, boutonVèKlasman, boutonVèReglaj]
+        for button in buttons {
+            if let gradientLayer = button.layer.value(forKey: "gradientLayer") as? CAGradientLayer {
+                gradientLayer.frame = button.bounds
+            }
+        }
+    }
 
     private func enstaleToutEleman() {
         konfigireAryèPlan()
@@ -253,8 +288,8 @@ class AkèyViewController: UIViewController {
     }
 
     private func konfigireAryèPlan() {
-        let koulèFon = UIColor(red: 0.98, green: 0.98, blue: 0.98, alpha: 1.0)
-        view.backgroundColor = koulèFon
+        // Add dynamic animated background with floating shapes
+        DynamicBackgroundFactory.createAnimatedBackground(for: view)
     }
 
     private func ajouteSouVi() {
@@ -277,11 +312,12 @@ class AkèyViewController: UIViewController {
     }
 
     private func konfigireToutBouton() {
-        let koulèFasil = NivoJwe.fasil.koulèPrènsipal
-        let koulèMwayen = NivoJwe.mwayen.koulèPrènsipal
-        let koulèDifisil = NivoJwe.difisil.koulèPrènsipal
-        let koulèTrofè = UIColor(red: 0.9, green: 0.7, blue: 0.2, alpha: 1.0)
-        let koulèParam = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0)
+        // Use modern gradient colors
+        let koulèFasil = DesignColors.successGradientStart
+        let koulèMwayen = DesignColors.primaryGradientStart
+        let koulèDifisil = DesignColors.accentGradientStart
+        let koulèTrofè = DesignColors.warningGradientStart
+        let koulèParam = UIColor(red: 0.6, green: 0.6, blue: 0.7, alpha: 1.0)
 
         let konfigFasil = KonfigiraskonBouton.kreyeNivo(
             tit: "🟢 Easy",

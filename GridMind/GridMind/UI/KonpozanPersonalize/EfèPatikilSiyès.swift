@@ -17,9 +17,15 @@ struct KonfigiraskonPatikil {
 
     static var defaut: [KonfigiraskonPatikil] {
         return [
-            kreyeKonfig(wouj: 1.0, vèt: 0.8, ble: 0.0, vitès: 100, dire: 2.0, echèl: 0.5),
-            kreyeKonfig(wouj: 1.0, vèt: 0.4, ble: 0.4, vitès: 120, dire: 2.5, echèl: 0.6),
-            kreyeKonfig(wouj: 0.4, vèt: 0.8, ble: 1.0, vitès: 110, dire: 1.8, echèl: 0.55)
+            // Purple-Blue gradient colors
+            kreyeKonfig(wouj: 0.49, vèt: 0.31, ble: 0.94, vitès: 150, dire: 2.5, echèl: 0.6),
+            kreyeKonfig(wouj: 0.29, vèt: 0.51, ble: 0.95, vitès: 130, dire: 2.0, echèl: 0.55),
+            // Success green
+            kreyeKonfig(wouj: 0.25, vèt: 0.82, ble: 0.58, vitès: 140, dire: 2.3, echèl: 0.58),
+            // Golden yellow
+            kreyeKonfig(wouj: 1.0, vèt: 0.75, ble: 0.29, vitès: 160, dire: 2.8, echèl: 0.62),
+            // Orange accent
+            kreyeKonfig(wouj: 1.0, vèt: 0.55, ble: 0.36, vitès: 145, dire: 2.2, echèl: 0.57)
         ]
     }
 
@@ -45,16 +51,17 @@ fileprivate struct KreyatèSelilStandard: FactorySelilPatikil {
     func kreeSelil(ak konfig: KonfigiraskonPatikil, imaj: UIImage) -> CAEmitterCell {
         let selil = CAEmitterCell()
 
-        selil.birthRate = 20.0
-        selil.lifetime = 2.0
-        selil.lifetimeRange = 0.5
+        selil.birthRate = 30.0
+        selil.lifetime = 2.5
+        selil.lifetimeRange = 0.8
         selil.velocity = konfig.vitès
-        selil.velocityRange = 50.0
+        selil.velocityRange = 60.0
         selil.emissionRange = CGFloat.pi * 2
         selil.spin = konfig.dire
-        selil.spinRange = 3.0
+        selil.spinRange = 4.0
         selil.scaleRange = konfig.echèl
-        selil.scaleSpeed = -0.1
+        selil.scaleSpeed = -0.15
+        selil.alphaSpeed = -0.4
         selil.contents = imaj.cgImage
         selil.color = konfig.koulè.cgColor
 
@@ -173,14 +180,18 @@ class EfèPatikilSiyès: UIView {
 
         var listPozisyon: [CGPoint] = []
 
-        for _ in 0..<5 {
-            let x = CGFloat.random(in: lajèEkran * 0.2...lajèEkran * 0.8)
-            let y = CGFloat.random(in: otèEkran * 0.3...otèEkran * 0.7)
+        // Create more explosion points for dramatic effect
+        for _ in 0..<8 {
+            let x = CGFloat.random(in: lajèEkran * 0.15...lajèEkran * 0.85)
+            let y = CGFloat.random(in: otèEkran * 0.25...otèEkran * 0.75)
             listPozisyon.append(CGPoint(x: x, y: y))
         }
 
-        for poz in listPozisyon {
-            kòmanseEfèSiyès(nan: poz)
+        for (index, poz) in listPozisyon.enumerated() {
+            let delay = Double(index) * 0.08
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                self.kòmanseEfèSiyès(nan: poz)
+            }
         }
     }
 
@@ -188,18 +199,24 @@ class EfèPatikilSiyès: UIView {
         let emèter = CAEmitterLayer()
         emèter.emitterPosition = pozisyon
         emèter.emitterShape = .circle
-        emèter.emitterSize = CGSize(width: 10, height: 10)
+        emèter.emitterSize = CGSize(width: 15, height: 15)
         emèter.renderMode = .additive
+        emèter.emitterZPosition = 10
         return emèter
     }
 
     private func programeArete(emèter: CAEmitterLayer) {
-        let delè1: TimeInterval = 1.5
-        let delè2: TimeInterval = 2.0
+        let delè1: TimeInterval = 2.0
+        let delè2: TimeInterval = 2.5
 
         DispatchQueue.main.asyncAfter(deadline: .now() + delè1) { [weak emèter] in
             guard let emèterReyèl = emèter else { return }
+            
+            // Gradually fade out
+            CATransaction.begin()
+            CATransaction.setAnimationDuration(0.5)
             emèterReyèl.birthRate = 0
+            CATransaction.commit()
 
             DispatchQueue.main.asyncAfter(deadline: .now() + delè2) {
                 emèterReyèl.removeFromSuperlayer()

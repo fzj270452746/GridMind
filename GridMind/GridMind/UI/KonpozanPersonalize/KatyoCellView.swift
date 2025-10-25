@@ -21,20 +21,17 @@ class KatyoCellView: UIView {
 
     private lazy var badNimewo: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 20, weight: .bold)
-        label.textColor = UIColor(white: 1.0, alpha: 1.0)
+        label.font = .systemFont(ofSize: 18, weight: .black)
+        label.textColor = UIColor.white
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         label.clipsToBounds = true
         label.isHidden = true
-
-        label.backgroundColor = UIColor(
-            red: 51.0/255.0,
-            green: 127.0/255.0,
-            blue: 204.0/255.0,
-            alpha: 0.95
-        )
-        label.layer.cornerRadius = 16
+        
+        // Modern gradient background
+        label.backgroundColor = DesignColors.successGradientStart
+        label.layer.cornerRadius = 14
+        label.layer.applyShadow(.small)
 
         return label
     }()
@@ -82,14 +79,18 @@ class KatyoCellView: UIView {
     }
 
     private func definiAparans() {
-        backgroundColor = UIColor(white: 1.0, alpha: 1.0)
-        layer.cornerRadius = 12
-
-        let lonbrèPropryete = layer
-        lonbrèPropryete.shadowColor = UIColor.black.cgColor
-        lonbrèPropryete.shadowOffset = CGSize(width: 0, height: 2)
-        lonbrèPropryete.shadowOpacity = 0.15
-        lonbrèPropryete.shadowRadius = 4
+        // Modern glass card effect
+        backgroundColor = UIColor(white: 1.0, alpha: 0.98)
+        layer.cornerRadius = DesignRadius.medium
+        layer.applyShadow(.medium)
+        
+        // Add subtle border
+        layer.borderWidth = 1.0
+        layer.borderColor = UIColor(white: 1.0, alpha: 0.3).cgColor
+        
+        // Enable 3D transforms
+        layer.masksToBounds = false
+        layer.shouldRasterize = false
     }
 
     private func ajouteSouVi() {
@@ -143,18 +144,15 @@ class KatyoCellView: UIView {
 
         let transfòmInisyal = CGAffineTransform(scaleX: 0.1, y: 0.1)
         badNimewo.transform = transfòmInisyal
+        badNimewo.alpha = 0
 
-        UIView.animate(
-            withDuration: 0.4,
-            delay: 0,
-            usingSpringWithDamping: 0.6,
-            initialSpringVelocity: 0.8,
-            options: .curveEaseOut,
-            animations: {
-                self.badNimewo.transform = CGAffineTransform.identity
-            },
-            completion: nil
-        )
+        AnimationUtilities.springAnimation(duration: 0.5, damping: 0.5, velocity: 1.0, animations: {
+            self.badNimewo.transform = CGAffineTransform.identity
+            self.badNimewo.alpha = 1
+        })
+        
+        // Add pulse effect
+        AnimationUtilities.pulseAnimation(view: badNimewo)
     }
 
     func kacheNimewo() {
@@ -186,19 +184,20 @@ class KatyoCellView: UIView {
 
     func animeEntransAk(_ reta: TimeInterval) {
         alpha = 0
-
-        let échel = CGAffineTransform(scaleX: 0.3, y: 0.3)
-        let wotasyon = CGFloat.pi / 4
-        transform = échel.rotated(by: wotasyon)
+        
+        // 3D flip animation
+        layer.transform = CATransform3DMakeRotation(.pi, 0, 1, 0)
+        transform = CGAffineTransform(scaleX: 0.3, y: 0.3)
 
         UIView.animate(
-            withDuration: 0.5,
+            withDuration: 0.6,
             delay: reta,
-            usingSpringWithDamping: 0.7,
-            initialSpringVelocity: 0.5,
-            options: .curveEaseOut,
+            usingSpringWithDamping: 0.65,
+            initialSpringVelocity: 0.8,
+            options: [.curveEaseOut, .allowUserInteraction],
             animations: {
                 self.alpha = 1
+                self.layer.transform = CATransform3DIdentity
                 self.transform = CGAffineTransform.identity
             },
             completion: nil
@@ -206,19 +205,44 @@ class KatyoCellView: UIView {
     }
 
     func animeSeleksyon() {
-        let transforme1 = CGAffineTransform(scaleX: 1.1, y: 1.1)
-
-        UIView.animate(
-            withDuration: 0.2,
-            animations: {
-                self.transform = transforme1
-            },
-            completion: { _ in
-                UIView.animate(withDuration: 0.2) {
-                    self.transform = CGAffineTransform.identity
-                }
-            }
-        )
+        // 3D bounce with perspective
+        let scaleUp = CGAffineTransform(scaleX: 1.15, y: 1.15)
+        let rotationTransform = CATransform3DMakeRotation(.pi / 16, 0, 1, 0)
+        
+        AnimationUtilities.springAnimation(duration: 0.3, damping: 0.6, velocity: 0.8, animations: {
+            self.transform = scaleUp
+            self.layer.transform = rotationTransform
+        }) { _ in
+            AnimationUtilities.springAnimation(duration: 0.3, damping: 0.7, animations: {
+                self.transform = .identity
+                self.layer.transform = CATransform3DIdentity
+            })
+        }
+        
+        // Add glow effect
+        addGlowEffect()
+    }
+    
+    private func addGlowEffect() {
+        let glowLayer = CALayer()
+        glowLayer.frame = bounds
+        glowLayer.cornerRadius = layer.cornerRadius
+        glowLayer.backgroundColor = DesignColors.successGradientStart.cgColor
+        glowLayer.opacity = 0
+        
+        layer.insertSublayer(glowLayer, at: 0)
+        
+        let glowAnimation = CABasicAnimation(keyPath: "opacity")
+        glowAnimation.fromValue = 0.6
+        glowAnimation.toValue = 0
+        glowAnimation.duration = 0.5
+        glowAnimation.timingFunction = CAMediaTimingFunction(name: .easeOut)
+        
+        glowLayer.add(glowAnimation, forKey: "glow")
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            glowLayer.removeFromSuperlayer()
+        }
     }
 
     func animeErè() {

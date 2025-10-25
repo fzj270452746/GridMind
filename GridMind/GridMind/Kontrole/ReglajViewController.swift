@@ -27,20 +27,23 @@ class ReglajViewController: UIViewController {
     // How to Play Section
     private let seksyonKòmanJwe: UIView = {
         let vi = UIView()
-        vi.backgroundColor = .white
-        vi.layer.cornerRadius = 16
-        vi.layer.shadowColor = UIColor.black.cgColor
-        vi.layer.shadowOffset = CGSize(width: 0, height: 2)
-        vi.layer.shadowOpacity = 0.1
-        vi.layer.shadowRadius = 8
+        vi.backgroundColor = UIColor(white: 1.0, alpha: 0.95)
+        vi.layer.cornerRadius = DesignRadius.large
+        vi.layer.applyShadow(.large)
         vi.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Add subtle border
+        vi.layer.borderWidth = 1.0
+        vi.layer.borderColor = UIColor(white: 1.0, alpha: 0.3).cgColor
+        
         return vi
     }()
 
     private let tikètKòmanJwe: UILabel = {
         let etikèt = UILabel()
         etikèt.text = "📖 How to Play"
-        etikèt.font = UIFont.systemFont(ofSize: 24, weight: .bold)
+        etikèt.font = DesignTypography.title2
+        etikèt.textColor = DesignColors.textPrimary
         etikèt.translatesAutoresizingMaskIntoConstraints = false
         return etikèt
     }()
@@ -48,8 +51,8 @@ class ReglajViewController: UIViewController {
     private let tèksEnstriksyon: UILabel = {
         let etikèt = UILabel()
         etikèt.numberOfLines = 0
-        etikèt.font = UIFont.systemFont(ofSize: 15, weight: .regular)
-        etikèt.textColor = .darkGray
+        etikèt.font = DesignTypography.body
+        etikèt.textColor = DesignColors.textSecondary
 
         let tèks = """
         🎮 Game Rules:
@@ -90,25 +93,13 @@ class ReglajViewController: UIViewController {
 
     // Feedback Section
     private let boutonFidba: UIButton = {
-        let bouton = UIButton(type: .system)
-        bouton.backgroundColor = UIColor(red: 0.2, green: 0.5, blue: 0.8, alpha: 1.0)
-        bouton.layer.cornerRadius = 16
-        bouton.layer.shadowColor = UIColor.black.cgColor
-        bouton.layer.shadowOffset = CGSize(width: 0, height: 2)
-        bouton.layer.shadowOpacity = 0.15
-        bouton.layer.shadowRadius = 8
+        let bouton = GradientButton()
         bouton.translatesAutoresizingMaskIntoConstraints = false
         return bouton
     }()
 
     private let boutonEfase: UIButton = {
-        let bouton = UIButton(type: .system)
-        bouton.backgroundColor = UIColor(red: 0.9, green: 0.4, blue: 0.4, alpha: 1.0)
-        bouton.layer.cornerRadius = 16
-        bouton.layer.shadowColor = UIColor.black.cgColor
-        bouton.layer.shadowOffset = CGSize(width: 0, height: 2)
-        bouton.layer.shadowOpacity = 0.15
-        bouton.layer.shadowRadius = 8
+        let bouton = GradientButton()
         bouton.translatesAutoresizingMaskIntoConstraints = false
         return bouton
     }()
@@ -118,14 +109,56 @@ class ReglajViewController: UIViewController {
         super.viewDidLoad()
         konfigireUI()
     }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        // Update background gradient frame
+        DynamicBackgroundFactory.updateBackgroundFrame(for: view)
+        
+        // Add gradient to buttons after layout
+        if boutonFidba.layer.sublayers?.first(where: { $0 is CAGradientLayer }) == nil {
+            let gradientFidba = GradientFactory.primaryGradient()
+            gradientFidba.frame = boutonFidba.bounds
+            gradientFidba.cornerRadius = DesignRadius.medium
+            boutonFidba.layer.insertSublayer(gradientFidba, at: 0)
+        }
+        
+        if boutonEfase.layer.sublayers?.first(where: { $0 is CAGradientLayer }) == nil {
+            let gradientEfase = GradientFactory.accentGradient()
+            gradientEfase.frame = boutonEfase.bounds
+            gradientEfase.cornerRadius = DesignRadius.medium
+            boutonEfase.layer.insertSublayer(gradientEfase, at: 0)
+        }
+        
+        // Update gradient frames
+        if let gradientFidba = boutonFidba.layer.sublayers?.first(where: { $0 is CAGradientLayer }) as? CAGradientLayer {
+            gradientFidba.frame = boutonFidba.bounds
+        }
+        
+        if let gradientEfase = boutonEfase.layer.sublayers?.first(where: { $0 is CAGradientLayer }) as? CAGradientLayer {
+            gradientEfase.frame = boutonEfase.bounds
+        }
+    }
 
     // MARK: - UI Configuration
     private func konfigireUI() {
         title = "Settings"
-        view.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1.0)
+        
+        // Add dynamic animated background
+        DynamicBackgroundFactory.createAnimatedBackground(for: view)
+        
         navigationController?.setNavigationBarHidden(false, animated: true)
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.navigationBar.tintColor = UIColor(red: 0.2, green: 0.5, blue: 0.8, alpha: 1.0)
+        navigationController?.navigationBar.tintColor = DesignColors.primaryGradientStart
+        
+        // Make navigation bar transparent
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithTransparentBackground()
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
 
         view.addSubview(defilerVi)
         defilerVi.addSubview(kontènèVi)
@@ -136,7 +169,7 @@ class ReglajViewController: UIViewController {
 
         kontènèVi.addSubview(boutonFidba)
         kontènèVi.addSubview(boutonEfase)
-
+        
         konfigireBouton(boutonFidba, ikòn: "✉️", tit: "Send Feedback", aksyon: #selector(boutonFidbaTape))
         konfigireBouton(boutonEfase, ikòn: "🗑️", tit: "Clear All Data", aksyon: #selector(boutonEfaseTape))
 
@@ -264,15 +297,15 @@ class ReglajViewController: UIViewController {
     }
 
     @objc private func boutonPreseAnba(_ bouton: UIButton) {
-        UIView.animate(withDuration: 0.1) {
+        AnimationUtilities.springAnimation(duration: 0.15, animations: {
             bouton.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
-        }
+        })
     }
 
     @objc private func boutonLage(_ bouton: UIButton) {
-        UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.5, options: .curveEaseOut) {
+        AnimationUtilities.springAnimation(duration: 0.3, damping: 0.6, animations: {
             bouton.transform = .identity
-        }
+        })
     }
 }
 

@@ -28,27 +28,32 @@ class JweViewController: UIViewController {
     // UI Components
     private let barAnwo: UIView = {
         let vi = UIView()
-        vi.backgroundColor = .white
-        vi.layer.shadowColor = UIColor.black.cgColor
-        vi.layer.shadowOffset = CGSize(width: 0, height: 2)
-        vi.layer.shadowOpacity = 0.1
-        vi.layer.shadowRadius = 4
+        vi.backgroundColor = UIColor(white: 1.0, alpha: 0.95)
+        vi.layer.applyShadow(.medium)
         vi.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Add subtle blur effect
+        let blurEffect = UIBlurEffect(style: .systemThinMaterialLight)
+        let blurView = UIVisualEffectView(effect: blurEffect)
+        blurView.isUserInteractionEnabled = false
+        blurView.translatesAutoresizingMaskIntoConstraints = false
+        vi.insertSubview(blurView, at: 0)
+        
         return vi
     }()
 
     private let boutonRetounen: UIButton = {
         let bouton = UIButton(type: .system)
         bouton.setTitle("← Back", for: .normal)
-        bouton.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
-        bouton.setTitleColor(UIColor(red: 0.2, green: 0.5, blue: 0.8, alpha: 1.0), for: .normal)
+        bouton.titleLabel?.font = DesignTypography.callout
+        bouton.setTitleColor(DesignColors.primaryGradientStart, for: .normal)
         bouton.translatesAutoresizingMaskIntoConstraints = false
         return bouton
     }()
 
     private let etikètNivo: UILabel = {
         let etikèt = UILabel()
-        etikèt.font = UIFont.systemFont(ofSize: 20, weight: .bold)
+        etikèt.font = DesignTypography.title3
         etikèt.textAlignment = .center
         etikèt.translatesAutoresizingMaskIntoConstraints = false
         return etikèt
@@ -56,8 +61,8 @@ class JweViewController: UIViewController {
 
     private let etikètPwen: UILabel = {
         let etikèt = UILabel()
-        etikèt.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
-        etikèt.textColor = .darkGray
+        etikèt.font = DesignTypography.body
+        etikèt.textColor = DesignColors.textSecondary
         etikèt.text = "Score: 0"
         etikèt.translatesAutoresizingMaskIntoConstraints = false
         return etikèt
@@ -65,19 +70,26 @@ class JweViewController: UIViewController {
 
     private let etikètTan: UILabel = {
         let etikèt = UILabel()
-        etikèt.font = UIFont.systemFont(ofSize: 48, weight: .bold)
+        etikèt.font = UIFont.systemFont(ofSize: 64, weight: .black)
         etikèt.textAlignment = .center
-        etikèt.textColor = UIColor(red: 0.2, green: 0.5, blue: 0.8, alpha: 1.0)
+        etikèt.textColor = DesignColors.primaryGradientStart
         etikèt.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Add shadow for better readability
+        etikèt.layer.shadowColor = UIColor.black.cgColor
+        etikèt.layer.shadowOffset = CGSize(width: 0, height: 2)
+        etikèt.layer.shadowOpacity = 0.15
+        etikèt.layer.shadowRadius = 4
+        
         return etikèt
     }()
 
     private let etikètEnstriksyon: UILabel = {
         let etikèt = UILabel()
-        etikèt.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        etikèt.font = DesignTypography.body
         etikèt.textAlignment = .center
         etikèt.numberOfLines = 0
-        etikèt.textColor = .darkGray
+        etikèt.textColor = DesignColors.textSecondary
         etikèt.translatesAutoresizingMaskIntoConstraints = false
         return etikèt
     }()
@@ -127,10 +139,24 @@ class JweViewController: UIViewController {
         super.viewWillDisappear(animated)
         kontèTan?.invalidate()
     }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        // Update background gradient frame
+        DynamicBackgroundFactory.updateBackgroundFrame(for: view)
+        
+        // Update blur view frame in top bar
+        if let blurView = barAnwo.subviews.first as? UIVisualEffectView {
+            blurView.frame = barAnwo.bounds
+        }
+    }
 
     // MARK: - UI Configuration
     private func konfigireUI() {
-        view.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1.0)
+        // Add dynamic animated background
+        DynamicBackgroundFactory.createAnimatedBackground(for: view)
+        
         navigationController?.setNavigationBarHidden(true, animated: false)
 
         view.addSubview(barAnwo)
@@ -292,17 +318,17 @@ class JweViewController: UIViewController {
         etikètTan.text = "\(tanRestan)"
 
         if tanRestan <= 5 {
-            etikètTan.textColor = UIColor(red: 0.9, green: 0.4, blue: 0.4, alpha: 1.0)
+            etikètTan.textColor = DesignColors.accentGradientStart
 
-            UIView.animate(withDuration: 0.2, animations: {
-                self.etikètTan.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+            AnimationUtilities.springAnimation(duration: 0.4, damping: 0.5, velocity: 0.8, animations: {
+                self.etikètTan.transform = CGAffineTransform(scaleX: 1.15, y: 1.15)
             }) { _ in
-                UIView.animate(withDuration: 0.2) {
+                AnimationUtilities.springAnimation(duration: 0.3, animations: {
                     self.etikètTan.transform = .identity
-                }
+                })
             }
         } else {
-            etikètTan.textColor = UIColor(red: 0.2, green: 0.5, blue: 0.8, alpha: 1.0)
+            etikètTan.textColor = DesignColors.primaryGradientStart
         }
     }
 

@@ -71,34 +71,43 @@ fileprivate protocol FactoryKonpozanDyalòg {
 fileprivate struct ImplemantasyonFactoryStandard: FactoryKonpozanDyalòg {
     func kreeKontènè() -> UIView {
         let kontenèPrènsipal = UIView()
-        kontenèPrènsipal.backgroundColor = UIColor(white: 1.0, alpha: 1.0)
-        kontenèPrènsipal.layer.cornerRadius = 24
+        kontenèPrènsipal.backgroundColor = UIColor(white: 1.0, alpha: 0.98)
+        kontenèPrènsipal.layer.cornerRadius = DesignRadius.xLarge
         kontenèPrènsipal.translatesAutoresizingMaskIntoConstraints = false
-
-        let propryeteLonm = kontenèPrènsipal.layer
-        propryeteLonm.shadowColor = UIColor.black.cgColor
-        propryeteLonm.shadowOffset = CGSize(width: 0, height: 10)
-        propryeteLonm.shadowOpacity = 0.3
-        propryeteLonm.shadowRadius = 20
+        
+        // Modern glass effect with border
+        kontenèPrènsipal.layer.borderWidth = 1.5
+        kontenèPrènsipal.layer.borderColor = UIColor(white: 1.0, alpha: 0.3).cgColor
+        kontenèPrènsipal.layer.applyShadow(.large)
+        
+        // Add blur effect
+        let blurEffect = UIBlurEffect(style: .systemThinMaterialLight)
+        let blurView = UIVisualEffectView(effect: blurEffect)
+        blurView.layer.cornerRadius = DesignRadius.xLarge
+        blurView.clipsToBounds = true
+        blurView.translatesAutoresizingMaskIntoConstraints = false
+        blurView.isUserInteractionEnabled = false
+        kontenèPrènsipal.insertSubview(blurView, at: 0)
 
         return kontenèPrènsipal
     }
 
     func kreeTikèt() -> UILabel {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 28, weight: .bold)
+        label.font = DesignTypography.title1
         label.textAlignment = .center
         label.numberOfLines = 0
+        label.textColor = DesignColors.textPrimary
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }
 
     func kreeMesaj() -> UILabel {
         let tèks = UILabel()
-        tèks.font = UIFont.systemFont(ofSize: 16, weight: .regular)
+        tèks.font = DesignTypography.body
         tèks.textAlignment = .center
         tèks.numberOfLines = 0
-        tèks.textColor = UIColor.darkGray
+        tèks.textColor = DesignColors.textSecondary
         tèks.translatesAutoresizingMaskIntoConstraints = false
         return tèks
     }
@@ -135,11 +144,22 @@ class BoitDyalògPèsonalize: UIView {
     }
 
     private func preparUI() {
-        let koulèFon = UIColor.black.withAlphaComponent(0.6)
+        let koulèFon = UIColor.black.withAlphaComponent(0.5)
         backgroundColor = koulèFon
         alpha = 0
 
         addSubview(vizyelKontenè)
+        
+        // Update blur view constraints if present
+        if let blurView = vizyelKontenè.subviews.first as? UIVisualEffectView {
+            NSLayoutConstraint.activate([
+                blurView.topAnchor.constraint(equalTo: vizyelKontenè.topAnchor),
+                blurView.leadingAnchor.constraint(equalTo: vizyelKontenè.leadingAnchor),
+                blurView.trailingAnchor.constraint(equalTo: vizyelKontenè.trailingAnchor),
+                blurView.bottomAnchor.constraint(equalTo: vizyelKontenè.bottomAnchor)
+            ])
+        }
+        
         vizyelKontenè.addSubview(labelTikèt)
         vizyelKontenè.addSubview(labelMesaj)
         vizyelKontenè.addSubview(stakBouton)
@@ -206,14 +226,17 @@ class BoitDyalògPèsonalize: UIView {
     }
 
     private func konstruBouton(avèk konfig: KonfigiraskonDyalòg.KonfigiraskonBoutonDyalòg, tag: Int) -> UIButton {
-        let bouton = UIButton(type: .system)
-
+        let bouton = GradientButton()
+        
         bouton.setTitle(konfig.tèks, for: .normal)
-        bouton.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
-        bouton.backgroundColor = konfig.koulè
-        bouton.setTitleColor(UIColor.white, for: .normal)
-        bouton.layer.cornerRadius = 12
         bouton.tag = tag
+        
+        // Create gradient based on color
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.colors = [konfig.koulè.cgColor, konfig.koulè.darker().cgColor]
+        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
+        gradientLayer.endPoint = CGPoint(x: 1, y: 1)
+        bouton.setGradient(gradientLayer)
 
         bouton.addTarget(self, action: #selector(jereKlikBouton(_:)), for: .touchUpInside)
         bouton.addTarget(self, action: #selector(jerePresBouton(_:)), for: .touchDown)
@@ -231,45 +254,46 @@ class BoitDyalògPèsonalize: UIView {
     }
 
     @objc private func jerePresBouton(_ bouton: UIButton) {
-        UIView.animate(withDuration: 0.1) {
+        AnimationUtilities.springAnimation(duration: 0.1, animations: {
             bouton.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
-        }
+        })
     }
 
     @objc private func jereRelasBouton(_ bouton: UIButton) {
-        UIView.animate(withDuration: 0.1) {
+        AnimationUtilities.springAnimation(duration: 0.2, damping: 0.7, animations: {
             bouton.transform = CGAffineTransform.identity
-        }
+        })
     }
 
     func afiche(nan vi: UIView) {
         vi.addSubview(self)
         self.frame = vi.bounds
 
-        let transformInisyal = CGAffineTransform(scaleX: 0.8, y: 0.8)
+        let transformInisyal = CGAffineTransform(scaleX: 0.7, y: 0.7)
         vizyelKontenè.transform = transformInisyal
+        vizyelKontenè.alpha = 0
 
-        UIView.animate(
-            withDuration: 0.3,
-            delay: 0,
-            usingSpringWithDamping: 0.7,
-            initialSpringVelocity: 0.5,
-            options: .curveEaseOut,
+        AnimationUtilities.springAnimation(
+            duration: 0.5,
+            damping: 0.65,
+            velocity: 0.8,
             animations: {
                 self.alpha = 1
+                self.vizyelKontenè.alpha = 1
                 self.vizyelKontenè.transform = CGAffineTransform.identity
-            },
-            completion: nil
+            }
         )
     }
 
     func kache() {
-        let transformFinal = CGAffineTransform(scaleX: 0.8, y: 0.8)
+        let transformFinal = CGAffineTransform(scaleX: 0.7, y: 0.7)
 
-        UIView.animate(
-            withDuration: 0.2,
+        AnimationUtilities.springAnimation(
+            duration: 0.3,
+            damping: 0.8,
             animations: {
                 self.alpha = 0
+                self.vizyelKontenè.alpha = 0
                 self.vizyelKontenè.transform = transformFinal
             },
             completion: { _ in
@@ -293,7 +317,7 @@ extension BoitDyalògPèsonalize {
             .avèkMesaj(mesajFinal)
             .ajouteBouton(
                 tèks: "Continue",
-                koulè: UIColor(red: 0.2, green: 0.7, blue: 0.5, alpha: 1.0),
+                koulè: DesignColors.successGradientStart,
                 aksyon: akerebouton
             )
             .konstryi()
@@ -307,7 +331,7 @@ extension BoitDyalògPèsonalize {
             .avèkMesaj(mesaj)
             .ajouteBouton(
                 tèks: "Try Again",
-                koulè: UIColor(red: 0.9, green: 0.4, blue: 0.4, alpha: 1.0),
+                koulè: DesignColors.accentGradientStart,
                 aksyon: reeseyeAksyon
             )
             .konstryi()
@@ -332,7 +356,7 @@ extension BoitDyalògPèsonalize {
             )
             .ajouteBouton(
                 tèks: "Confirm",
-                koulè: UIColor(red: 0.2, green: 0.5, blue: 0.8, alpha: 1.0),
+                koulè: DesignColors.primaryGradientStart,
                 aksyon: konfimeAksyon
             )
             .konstryi()
