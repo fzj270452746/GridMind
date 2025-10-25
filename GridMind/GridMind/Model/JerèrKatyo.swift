@@ -7,162 +7,195 @@
 
 import Foundation
 
-// MARK: - Generation Strategy Protocol
+// MARK: - Generator Base Protocol
 
-protocol StrategyJenerasyon {
-    func jenere() -> [MahjongKatyo]
+protocol BazProdiktè {
+    associatedtype Pwodui
+    func kreye() -> [Pwodui]
 }
 
-protocol StrategyMelanje {
-    func melanje<T>(_ eleman: [T]) -> [T]
+protocol TransfòmatèOrd {
+    func aplikeTranfòmasyon<E>(_ eleman: [E]) -> [E]
 }
 
-// MARK: - Factory Protocol
+// MARK: - Provider Protocol
 
-protocol FactoryKatyo {
-    func kreeToutKatyo() -> [MahjongKatyo]
-    func kreeKatyoAleatwa(kantite: Int) -> [MahjongKatyo]
+protocol FounisèKatyo {
+    func bay_tout_katyo() -> [MahjongKatyo]
+    func bay_katyo_melanje(kantite: Int) -> [MahjongKatyo]
 }
 
-// MARK: - Shuffle Implementation
+// MARK: - Shuffle Strategy Implementation
 
-fileprivate struct AlgoritmMelanjeStandard: StrategyMelanje {
-    func melanje<T>(_ eleman: [T]) -> [T] {
-        var kopi = eleman
-        var endèksCourant = kopi.count
-
-        while endèksCourant > 1 {
-            endèksCourant -= 1
-            let endèksAleatwa = Int.random(in: 0...endèksCourant)
-            kopi.swapAt(endèksCourant, endèksAleatwa)
-        }
-
-        return kopi
-    }
-}
-
-// MARK: - Tile Generation Implementations
-
-fileprivate struct ProdiktèKatyoOdinè: StrategyJenerasyon {
-    private let tipKatyo: TipKatyo
-    private let ranjeMinMax: (min: Int, max: Int)
-
-    init(tip: TipKatyo, min: Int, max: Int) {
-        self.tipKatyo = tip
-        self.ranjeMinMax = (min, max)
-    }
-
-    func jenere() -> [MahjongKatyo] {
-        var rezilta: [MahjongKatyo] = []
-        for valè in ranjeMinMax.min...ranjeMinMax.max {
-            let katyo = MahjongKatyo(tip: tipKatyo, valè: valè)
-            rezilta.append(katyo)
-        }
+fileprivate struct StratejiMelanjeFisherYates: TransfòmatèOrd {
+    func aplikeTranfòmasyon<E>(_ eleman: [E]) -> [E] {
+        guard eleman.count > 1 else { return eleman }
+        
+        var rezilta = eleman
+        var pozisyonAktyèl = rezilta.count
+        
+        repeat {
+            pozisyonAktyèl -= 1
+            let pwenAleyatwa = Int.random(in: 0...pozisyonAktyèl)
+            rezilta.swapAt(pozisyonAktyèl, pwenAleyatwa)
+        } while pozisyonAktyèl > 1
+        
         return rezilta
     }
 }
 
-fileprivate struct ProdiktèKatyoSpesyal: StrategyJenerasyon {
-    private let limit: Int
+// MARK: - Tile Builders
 
-    init(kantiteMax: Int) {
-        self.limit = kantiteMax
+fileprivate struct KonstryiktèKatyoSeri: BazProdiktè {
+    typealias Pwodui = MahjongKatyo
+    
+    private let kategoriya: TipKatyo
+    private let entèval: ClosedRange<Int>
+    
+    init(pou tip: TipKatyo, soti min: Int, rive max: Int) {
+        self.kategoriya = tip
+        self.entèval = min...max
     }
-
-    func jenere() -> [MahjongKatyo] {
-        return (1...limit).map { valè in
-            MahjongKatyo(tip: .mssiu, valè: valè)
+    
+    func kreye() -> [MahjongKatyo] {
+        return entèval.map { nimewo in
+            MahjongKatyo(tip: kategoriya, valè: nimewo)
         }
     }
 }
 
-// MARK: - Main Tile Manager Class
+fileprivate struct KonstryiktèKatyoEspesyal: BazProdiktè {
+    typealias Pwodui = MahjongKatyo
+    
+    private let maksimon: Int
+    
+    init(total: Int) {
+        self.maksimon = total
+    }
+    
+    func kreye() -> [MahjongKatyo] {
+        return (1...maksimon).compactMap { endis in
+            MahjongKatyo(tip: .mssiu, valè: endis)
+        }
+    }
+}
 
-class JerèrKatyo: FactoryKatyo {
+// MARK: - Composite Generator
+
+fileprivate class AgregaGeneratè {
+    private var koleksyonProdiktè: [any BazProdiktè]
+    
+    init() {
+        self.koleksyonProdiktè = []
+    }
+    
+    func ajoute<T: BazProdiktè>(prodiktè: T) where T.Pwodui == MahjongKatyo {
+        koleksyonProdiktè.append(prodiktè)
+    }
+    
+    func jenere_tout() -> [MahjongKatyo] {
+        var akimilasyon: [MahjongKatyo] = []
+        
+        for pwodiktè in koleksyonProdiktè {
+            let gwoup = pwodiktè.kreye()
+            if let katyoGwoup = gwoup as? [MahjongKatyo] {
+                akimilasyon.append(contentsOf: katyoGwoup)
+            }
+        }
+        
+        return akimilasyon
+    }
+}
+
+// MARK: - Main Tile Manager
+
+class JerèrKatyo: FounisèKatyo {
     static let pataje = JerèrKatyo()
-
-    private var koleksyonJeneratè: [StrategyJenerasyon]
-    private var algoritmMelanje: StrategyMelanje
-
+    
+    private let agre: AgregaGeneratè
+    private let tranfòmatè: TransfòmatèOrd
+    
     private init() {
-        self.koleksyonJeneratè = []
-        self.algoritmMelanje = AlgoritmMelanjeStandard()
-        konfigireJeneratè()
+        self.agre = AgregaGeneratè()
+        self.tranfòmatè = StratejiMelanjeFisherYates()
+        enstaleProdiktè()
     }
-
-    private func konfigireJeneratè() {
-        let tipOdinè: [TipKatyo] = [.hudy, .koieb, .zounl]
-
-        for tip in tipOdinè {
-            let jeneratè = ProdiktèKatyoOdinè(tip: tip, min: 1, max: 9)
-            koleksyonJeneratè.append(jeneratè)
+    
+    private func enstaleProdiktè() {
+        // Setup regular tile generators
+        let tipNòmal: [TipKatyo] = [.hudy, .koieb, .zounl]
+        
+        tipNòmal.forEach { kategori in
+            let biltè = KonstryiktèKatyoSeri(pou: kategori, soti: 1, rive: 9)
+            agre.ajoute(prodiktè: biltè)
         }
-
-        let jeneratèSpesyal = ProdiktèKatyoSpesyal(kantiteMax: 6)
-        koleksyonJeneratè.append(jeneratèSpesyal)
+        
+        // Setup special tiles generator
+        let biltèSpesyal = KonstryiktèKatyoEspesyal(total: 6)
+        agre.ajoute(prodiktè: biltèSpesyal)
     }
-
+    
+    func bay_tout_katyo() -> [MahjongKatyo] {
+        return agre.jenere_tout()
+    }
+    
+    func bay_katyo_melanje(kantite: Int) -> [MahjongKatyo] {
+        let ensanmTotal = bay_tout_katyo()
+        let miks = tranfòmatè.aplikeTranfòmasyon(ensanmTotal)
+        
+        let limit = min(kantite, miks.count)
+        return Array(miks.prefix(limit))
+    }
+    
+    // Legacy compatibility methods
     func kreeToutKatyo() -> [MahjongKatyo] {
-        var ensanmKatyo: [MahjongKatyo] = []
-
-        for jeneratè in koleksyonJeneratè {
-            let katyoJenere = jeneratè.jenere()
-            ensanmKatyo += katyoJenere
-        }
-
-        return ensanmKatyo
+        return bay_tout_katyo()
     }
-
+    
     func kreeKatyoAleatwa(kantite: Int) -> [MahjongKatyo] {
-        let toutKatyoDisponib = kreeToutKatyo()
-        let katyoMelanje = algoritmMelanje.melanje(toutKatyoDisponib)
-
-        let kantiteReyèl = min(kantite, katyoMelanje.count)
-        var seleksyone: [MahjongKatyo] = []
-
-        for i in 0..<kantiteReyèl {
-            seleksyone.append(katyoMelanje[i])
-        }
-
-        return seleksyone
+        return bay_katyo_melanje(kantite: kantite)
     }
-
+    
     func jenereToutKatyo() -> [MahjongKatyo] {
-        return kreeToutKatyo()
+        return bay_tout_katyo()
     }
-
+    
     func chwaziKatyoAleatwa(kantite: Int) -> [MahjongKatyo] {
-        return kreeKatyoAleatwa(kantite: kantite)
+        return bay_katyo_melanje(kantite: kantite)
     }
-
+    
     func melanje(_ katyo: [MahjongKatyo]) -> [MahjongKatyo] {
-        return algoritmMelanje.melanje(katyo)
+        return tranfòmatè.aplikeTranfòmasyon(katyo)
     }
-
+    
     func melanjeAvèkSeed(_ katyo: [MahjongKatyo], seed: Int) -> [MahjongKatyo] {
-        var kopi = katyo
-        var rng = SeededRandomGenerator(seed: seed)
-
-        for i in stride(from: kopi.count - 1, through: 1, by: -1) {
-            let j = Int(rng.next() % UInt32(i + 1))
-            kopi.swapAt(i, j)
+        var jeneratè = GeneratèAvèkSemen(semen: seed)
+        var kopiya = katyo
+        
+        for i in stride(from: kopiya.count - 1, to: 0, by: -1) {
+            let j = jeneratè.pwochen() % (i + 1)
+            kopiya.swapAt(i, j)
         }
-
-        return kopi
+        
+        return kopiya
     }
 }
 
-// MARK: - Seeded Random Generator
+// MARK: - Seeded Generator
 
-fileprivate struct SeededRandomGenerator {
-    private var state: UInt32
-
-    init(seed: Int) {
-        self.state = UInt32(truncatingIfNeeded: seed)
+fileprivate struct GeneratèAvèkSemen {
+    private var eta: UInt64
+    
+    init(semen: Int) {
+        self.eta = UInt64(truncatingIfNeeded: semen)
+        // Initialize with better seed mixing
+        eta = eta &* 6364136223846793005 &+ 1442695040888963407
     }
-
-    mutating func next() -> UInt32 {
-        state = state &* 1103515245 &+ 12345
-        return (state / 65536) % 32768
+    
+    mutating func pwochen() -> Int {
+        // Linear congruential generator
+        eta = eta &* 6364136223846793005 &+ 1442695040888963407
+        let rezilta = UInt32(truncatingIfNeeded: (eta &>> 32))
+        return Int(rezilta % 32768)
     }
 }

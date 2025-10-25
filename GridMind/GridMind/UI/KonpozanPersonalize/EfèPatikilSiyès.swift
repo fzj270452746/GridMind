@@ -7,82 +7,78 @@
 
 import UIKit
 
-// MARK: - Particle Configuration
+// MARK: - Particle Settings
 
-struct KonfigiraskonPatikil {
+struct ParametPatikil {
     let koulè: UIColor
-    let vitès: CGFloat
-    let dire: CGFloat
-    let echèl: CGFloat
+    let vistès: CGFloat
+    let rotasyon: CGFloat
+    let echèl_baz: CGFloat
 
-    static var defaut: [KonfigiraskonPatikil] {
+    static var palets_defo: [ParametPatikil] {
         return [
-            // Purple-Blue gradient colors
-            kreyeKonfig(wouj: 0.49, vèt: 0.31, ble: 0.94, vitès: 150, dire: 2.5, echèl: 0.6),
-            kreyeKonfig(wouj: 0.29, vèt: 0.51, ble: 0.95, vitès: 130, dire: 2.0, echèl: 0.55),
-            // Success green
-            kreyeKonfig(wouj: 0.25, vèt: 0.82, ble: 0.58, vitès: 140, dire: 2.3, echèl: 0.58),
-            // Golden yellow
-            kreyeKonfig(wouj: 1.0, vèt: 0.75, ble: 0.29, vitès: 160, dire: 2.8, echèl: 0.62),
-            // Orange accent
-            kreyeKonfig(wouj: 1.0, vèt: 0.55, ble: 0.36, vitès: 145, dire: 2.2, echèl: 0.57)
+            fabrike(r: 0.49, g: 0.31, b: 0.94, vit: 150, rot: 2.5, ech: 0.6),
+            fabrike(r: 0.29, g: 0.51, b: 0.95, vit: 130, rot: 2.0, ech: 0.55),
+            fabrike(r: 0.25, g: 0.82, b: 0.58, vit: 140, rot: 2.3, ech: 0.58),
+            fabrike(r: 1.0, g: 0.75, b: 0.29, vit: 160, rot: 2.8, ech: 0.62),
+            fabrike(r: 1.0, g: 0.55, b: 0.36, vit: 145, rot: 2.2, ech: 0.57)
         ]
     }
 
-    private static func kreyeKonfig(wouj: CGFloat, vèt: CGFloat, ble: CGFloat, vitès: CGFloat, dire: CGFloat, echèl: CGFloat) -> KonfigiraskonPatikil {
-        return KonfigiraskonPatikil(
-            koulè: UIColor(red: wouj, green: vèt, blue: ble, alpha: 1.0),
-            vitès: vitès,
-            dire: dire,
-            echèl: echèl
+    private static func fabrike(r: CGFloat, g: CGFloat, b: CGFloat, vit: CGFloat, rot: CGFloat, ech: CGFloat) -> ParametPatikil {
+        return ParametPatikil(
+            koulè: UIColor(red: r, green: g, blue: b, alpha: 1.0),
+            vistès: vit,
+            rotasyon: rot,
+            echèl_baz: ech
         )
     }
 }
 
-// MARK: - Cell Factory Protocol
+// MARK: - Cell Builder Protocol
 
-fileprivate protocol FactorySelilPatikil {
-    func kreeSelil(ak konfig: KonfigiraskonPatikil, imaj: UIImage) -> CAEmitterCell
+fileprivate protocol KonstryiktèSelil {
+    func fabrike(_ param: ParametPatikil, imaj: UIImage) -> CAEmitterCell
 }
 
-// MARK: - Standard Cell Factory
+// MARK: - Standard Cell Builder
 
-fileprivate struct KreyatèSelilStandard: FactorySelilPatikil {
-    func kreeSelil(ak konfig: KonfigiraskonPatikil, imaj: UIImage) -> CAEmitterCell {
+fileprivate struct BiltèSelilStandard: KonstryiktèSelil {
+    func fabrike(_ param: ParametPatikil, imaj: UIImage) -> CAEmitterCell {
         let selil = CAEmitterCell()
 
         selil.birthRate = 30.0
         selil.lifetime = 2.5
         selil.lifetimeRange = 0.8
-        selil.velocity = konfig.vitès
+        selil.velocity = param.vistès
         selil.velocityRange = 60.0
         selil.emissionRange = CGFloat.pi * 2
-        selil.spin = konfig.dire
+        selil.spin = param.rotasyon
         selil.spinRange = 4.0
-        selil.scaleRange = konfig.echèl
+        selil.scaleRange = param.echèl_baz
         selil.scaleSpeed = -0.15
         selil.alphaSpeed = -0.4
         selil.contents = imaj.cgImage
-        selil.color = konfig.koulè.cgColor
+        selil.color = param.koulè.cgColor
 
         return selil
     }
 }
 
-// MARK: - Shape Generator Protocol
+// MARK: - Image Generator Protocol
 
-fileprivate protocol JeneratèFòm {
-    func kreeImaj(ak koulè: UIColor, gwosè: CGFloat) -> UIImage
+fileprivate protocol JeneratèGrafik {
+    func pwodui(_ koulè: UIColor, dimansyon: CGFloat) -> UIImage
 }
 
-// MARK: - Star Shape Generator
+// MARK: - Star Generator
 
-fileprivate struct ProdiktèEtwal: JeneratèFòm {
-    func kreeImaj(ak koulè: UIColor, gwosè: CGFloat) -> UIImage {
-        let dimansyon = CGSize(width: gwosè, height: gwosè)
-        let rektang = CGRect(origin: CGPoint.zero, size: dimansyon)
+fileprivate struct PwodiktèEtwal: JeneratèGrafik {
+    func pwodui(_ koulè: UIColor, dimansyon: CGFloat) -> UIImage {
+        let tay = CGSize(width: dimansyon, height: dimansyon)
+        let rektang = CGRect(origin: CGPoint.zero, size: tay)
 
-        UIGraphicsBeginImageContextWithOptions(dimansyon, false, 0)
+        UIGraphicsBeginImageContextWithOptions(tay, false, 0)
         defer { UIGraphicsEndImageContext() }
 
         guard let konteks = UIGraphicsGetCurrentContext() else {
@@ -91,46 +87,45 @@ fileprivate struct ProdiktèEtwal: JeneratèFòm {
 
         konteks.setFillColor(koulè.cgColor)
 
-        let santral = CGPoint(x: gwosè / 2, y: gwosè / 2)
-        let rayon = gwosè / 2
-        desineEtwalDans(konteks: konteks, santè: santral, rayon: rayon)
+        let sant = CGPoint(x: dimansyon / 2, y: dimansyon / 2)
+        let rayon = dimansyon / 2
+        desine_etwal_5_pwent(konteks: konteks, santè: sant, rayon: rayon)
 
-        guard let imajFinal = UIGraphicsGetImageFromCurrentImageContext() else {
+        guard let rezilta = UIGraphicsGetImageFromCurrentImageContext() else {
             return UIImage()
         }
 
-        return imajFinal
+        return rezilta
     }
 
-    private func desineEtwalDans(konteks: CGContext, santè: CGPoint, rayon: CGFloat) {
-        var pwenEksteryè: [CGPoint] = []
-        var pwenEnteryè: [CGFloat] = []
+    private func desine_etwal_5_pwent(konteks: CGContext, santè: CGPoint, rayon: CGFloat) {
+        var pwent_eksteryè: [CGPoint] = []
 
         for i in 0..<5 {
             let ang = CGFloat(i) * CGFloat.pi * 2 / 5 - CGFloat.pi / 2
             let x = santè.x + rayon * cos(ang)
             let y = santè.y + rayon * sin(ang)
-            pwenEksteryè.append(CGPoint(x: x, y: y))
+            pwent_eksteryè.append(CGPoint(x: x, y: y))
         }
 
-        var pwenEntèn: [CGPoint] = []
+        var pwent_enteryè: [CGPoint] = []
         for i in 0..<5 {
-            let angDekale = CGFloat(i) * CGFloat.pi * 2 / 5 - CGFloat.pi / 2 + CGFloat.pi / 5
-            let rayonEntèn = rayon * 0.4
-            let x = santè.x + rayonEntèn * cos(angDekale)
-            let y = santè.y + rayonEntèn * sin(angDekale)
-            pwenEntèn.append(CGPoint(x: x, y: y))
+            let ang_offset = CGFloat(i) * CGFloat.pi * 2 / 5 - CGFloat.pi / 2 + CGFloat.pi / 5
+            let rayon_int = rayon * 0.4
+            let x = santè.x + rayon_int * cos(ang_offset)
+            let y = santè.y + rayon_int * sin(ang_offset)
+            pwent_enteryè.append(CGPoint(x: x, y: y))
         }
 
         konteks.beginPath()
 
         for i in 0..<5 {
             if i == 0 {
-                konteks.move(to: pwenEksteryè[i])
+                konteks.move(to: pwent_eksteryè[i])
             } else {
-                konteks.addLine(to: pwenEksteryè[i])
+                konteks.addLine(to: pwent_eksteryè[i])
             }
-            konteks.addLine(to: pwenEntèn[i])
+            konteks.addLine(to: pwent_enteryè[i])
         }
 
         konteks.closePath()
@@ -142,13 +137,13 @@ fileprivate struct ProdiktèEtwal: JeneratèFòm {
 
 class EfèPatikilSiyès: UIView {
 
-    private var koleksyonEmèter: [CAEmitterLayer] = []
-    private let fabrikSelil: FactorySelilPatikil
-    private let prodiktèFòm: JeneratèFòm
+    private var koleksyon_emèter: [CAEmitterLayer] = []
+    private let fabrik_selil: KonstryiktèSelil
+    private let jeneratè_imaj: JeneratèGrafik
 
     override init(frame: CGRect) {
-        self.fabrikSelil = KreyatèSelilStandard()
-        self.prodiktèFòm = ProdiktèEtwal()
+        self.fabrik_selil = BiltèSelilStandard()
+        self.jeneratè_imaj = PwodiktèEtwal()
         super.init(frame: frame)
         isUserInteractionEnabled = false
     }
@@ -158,77 +153,75 @@ class EfèPatikilSiyès: UIView {
     }
 
     func kòmanseEfèSiyès(nan pozisyon: CGPoint) {
-        let nouvoEmèter = fabrikeEmèter(pozisyon: pozisyon)
+        let emèter_nouvo = monte_emèter(pozisyon: pozisyon)
 
-        var listaSelil: [CAEmitterCell] = []
-        for konfig in KonfigiraskonPatikil.defaut {
-            let imaj = prodiktèFòm.kreeImaj(ak: konfig.koulè, gwosè: 20)
-            let selil = fabrikSelil.kreeSelil(ak: konfig, imaj: imaj)
-            listaSelil.append(selil)
+        var lis_selil: [CAEmitterCell] = []
+        for param in ParametPatikil.palets_defo {
+            let imaj = jeneratè_imaj.pwodui(param.koulè, dimansyon: 20)
+            let selil = fabrik_selil.fabrike(param, imaj: imaj)
+            lis_selil.append(selil)
         }
 
-        nouvoEmèter.emitterCells = listaSelil
-        layer.addSublayer(nouvoEmèter)
-        koleksyonEmèter.append(nouvoEmèter)
+        emèter_nouvo.emitterCells = lis_selil
+        layer.addSublayer(emèter_nouvo)
+        koleksyon_emèter.append(emèter_nouvo)
 
-        programeArete(emèter: nouvoEmèter)
+        pwograme_fèmti(emèter: emèter_nouvo)
     }
 
     func kòmanseEfèSelebrasyon() {
-        let lajèEkran = bounds.width
-        let otèEkran = bounds.height
+        let lajè = bounds.width
+        let otè = bounds.height
 
-        var listPozisyon: [CGPoint] = []
+        var pozisyon_lis: [CGPoint] = []
 
-        // Create more explosion points for dramatic effect
         for _ in 0..<8 {
-            let x = CGFloat.random(in: lajèEkran * 0.15...lajèEkran * 0.85)
-            let y = CGFloat.random(in: otèEkran * 0.25...otèEkran * 0.75)
-            listPozisyon.append(CGPoint(x: x, y: y))
+            let x = CGFloat.random(in: lajè * 0.15...lajè * 0.85)
+            let y = CGFloat.random(in: otè * 0.25...otè * 0.75)
+            pozisyon_lis.append(CGPoint(x: x, y: y))
         }
 
-        for (index, poz) in listPozisyon.enumerated() {
-            let delay = Double(index) * 0.08
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+        for (index, poz) in pozisyon_lis.enumerated() {
+            let ret = Double(index) * 0.08
+            DispatchQueue.main.asyncAfter(deadline: .now() + ret) {
                 self.kòmanseEfèSiyès(nan: poz)
             }
         }
     }
 
-    private func fabrikeEmèter(pozisyon: CGPoint) -> CAEmitterLayer {
-        let emèter = CAEmitterLayer()
-        emèter.emitterPosition = pozisyon
-        emèter.emitterShape = .circle
-        emèter.emitterSize = CGSize(width: 15, height: 15)
-        emèter.renderMode = .additive
-        emèter.emitterZPosition = 10
-        return emèter
+    private func monte_emèter(pozisyon: CGPoint) -> CAEmitterLayer {
+        let em = CAEmitterLayer()
+        em.emitterPosition = pozisyon
+        em.emitterShape = .circle
+        em.emitterSize = CGSize(width: 15, height: 15)
+        em.renderMode = .additive
+        em.emitterZPosition = 10
+        return em
     }
 
-    private func programeArete(emèter: CAEmitterLayer) {
-        let delè1: TimeInterval = 2.0
-        let delè2: TimeInterval = 2.5
+    private func pwograme_fèmti(emèter: CAEmitterLayer) {
+        let ret1: TimeInterval = 2.0
+        let ret2: TimeInterval = 2.5
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + delè1) { [weak emèter] in
-            guard let emèterReyèl = emèter else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + ret1) { [weak emèter] in
+            guard let em = emèter else { return }
             
-            // Gradually fade out
             CATransaction.begin()
             CATransaction.setAnimationDuration(0.5)
-            emèterReyèl.birthRate = 0
+            em.birthRate = 0
             CATransaction.commit()
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + delè2) {
-                emèterReyèl.removeFromSuperlayer()
+            DispatchQueue.main.asyncAfter(deadline: .now() + ret2) {
+                em.removeFromSuperlayer()
             }
         }
     }
 
     func rete() {
-        for emèter in koleksyonEmèter {
-            emèter.birthRate = 0
-            emèter.removeFromSuperlayer()
+        for em in koleksyon_emèter {
+            em.birthRate = 0
+            em.removeFromSuperlayer()
         }
-        koleksyonEmèter.removeAll()
+        koleksyon_emèter.removeAll()
     }
 }

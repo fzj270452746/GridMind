@@ -11,30 +11,29 @@ class JweViewController: UIViewController {
 
     // MARK: - Properties
     private let nivo: NivoJwe
-    private var katyoLis: [MahjongKatyo] = []
-    private var orijinalSekans: [MahjongKatyo] = []
-    private var seleksyonSekans: [MahjongKatyo] = []
-    private var endèksSeleksyonAktiyèl: Int = 0
+    private var lis_katyo: [MahjongKatyo] = []
+    private var sekans_orijinal: [MahjongKatyo] = []
+    private var sekans_chwa: [MahjongKatyo] = []
+    private var endèks_aktyèl: Int = 0
 
-    private var etaJwe: EtaJwe = .afichaj {
+    private var eta_aktyèl: EtatJwe = .afichaj {
         didSet {
-            mizeAjouPouEtaJwe()
+            mete_ajou_pou_eta()
         }
     }
 
-    private var kontèTan: Timer?
-    private var tanRestan: Int = 10
+    private var timatè: Timer?
+    private var tan_ki_rete: Int = 10
 
     // UI Components
-    private let barAnwo: UIView = {
+    private let bann_anwo: UIView = {
         let vi = UIView()
         vi.backgroundColor = UIColor(white: 1.0, alpha: 0.95)
         vi.layer.applyShadow(.medium)
         vi.translatesAutoresizingMaskIntoConstraints = false
         
-        // Add subtle blur effect
-        let blurEffect = UIBlurEffect(style: .systemThinMaterialLight)
-        let blurView = UIVisualEffectView(effect: blurEffect)
+        let blur = UIBlurEffect(style: .systemThinMaterialLight)
+        let blurView = UIVisualEffectView(effect: blur)
         blurView.isUserInteractionEnabled = false
         blurView.translatesAutoresizingMaskIntoConstraints = false
         vi.insertSubview(blurView, at: 0)
@@ -42,79 +41,78 @@ class JweViewController: UIViewController {
         return vi
     }()
 
-    private let boutonRetounen: UIButton = {
-        let bouton = UIButton(type: .system)
-        bouton.setTitle("← Back", for: .normal)
-        bouton.titleLabel?.font = DesignTypography.callout
-        bouton.setTitleColor(DesignColors.primaryGradientStart, for: .normal)
-        bouton.translatesAutoresizingMaskIntoConstraints = false
-        return bouton
+    private let btn_retounen: UIButton = {
+        let btn = UIButton(type: .system)
+        btn.setTitle("← Back", for: .normal)
+        btn.titleLabel?.font = DesignTypography.callout
+        btn.setTitleColor(DesignColors.primaryGradientStart, for: .normal)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        return btn
     }()
 
-    private let etikètNivo: UILabel = {
-        let etikèt = UILabel()
-        etikèt.font = DesignTypography.title3
-        etikèt.textAlignment = .center
-        etikèt.translatesAutoresizingMaskIntoConstraints = false
-        return etikèt
+    private let lab_nivo: UILabel = {
+        let lab = UILabel()
+        lab.font = DesignTypography.title3
+        lab.textAlignment = .center
+        lab.translatesAutoresizingMaskIntoConstraints = false
+        return lab
     }()
 
-    private let etikètPwen: UILabel = {
-        let etikèt = UILabel()
-        etikèt.font = DesignTypography.body
-        etikèt.textColor = DesignColors.textSecondary
-        etikèt.text = "Score: 0"
-        etikèt.translatesAutoresizingMaskIntoConstraints = false
-        return etikèt
+    private let lab_pwen: UILabel = {
+        let lab = UILabel()
+        lab.font = DesignTypography.body
+        lab.textColor = DesignColors.textSecondary
+        lab.text = "Score: 0"
+        lab.translatesAutoresizingMaskIntoConstraints = false
+        return lab
     }()
 
-    private let etikètTan: UILabel = {
-        let etikèt = UILabel()
-        etikèt.font = UIFont.systemFont(ofSize: 64, weight: .black)
-        etikèt.textAlignment = .center
-        etikèt.textColor = DesignColors.primaryGradientStart
-        etikèt.translatesAutoresizingMaskIntoConstraints = false
+    private let lab_tan: UILabel = {
+        let lab = UILabel()
+        lab.font = UIFont.systemFont(ofSize: 64, weight: .black)
+        lab.textAlignment = .center
+        lab.textColor = DesignColors.primaryGradientStart
+        lab.translatesAutoresizingMaskIntoConstraints = false
         
-        // Add shadow for better readability
-        etikèt.layer.shadowColor = UIColor.black.cgColor
-        etikèt.layer.shadowOffset = CGSize(width: 0, height: 2)
-        etikèt.layer.shadowOpacity = 0.15
-        etikèt.layer.shadowRadius = 4
+        lab.layer.shadowColor = UIColor.black.cgColor
+        lab.layer.shadowOffset = CGSize(width: 0, height: 2)
+        lab.layer.shadowOpacity = 0.15
+        lab.layer.shadowRadius = 4
         
-        return etikèt
+        return lab
     }()
 
-    private let etikètEnstriksyon: UILabel = {
-        let etikèt = UILabel()
-        etikèt.font = DesignTypography.body
-        etikèt.textAlignment = .center
-        etikèt.numberOfLines = 0
-        etikèt.textColor = DesignColors.textSecondary
-        etikèt.translatesAutoresizingMaskIntoConstraints = false
-        return etikèt
+    private let lab_enstriksyon: UILabel = {
+        let lab = UILabel()
+        lab.font = DesignTypography.body
+        lab.textAlignment = .center
+        lab.numberOfLines = 0
+        lab.textColor = DesignColors.textSecondary
+        lab.translatesAutoresizingMaskIntoConstraints = false
+        return lab
     }()
 
-    private let kontènèGrid: UIView = {
+    private let zone_grid: UIView = {
         let vi = UIView()
         vi.translatesAutoresizingMaskIntoConstraints = false
         return vi
     }()
 
-    private var selilKatyo: [KatyoCellView] = []
+    private var lis_selil: [KatyoCellView] = []
 
-    private var pwenTotal: Int = 0 {
+    private var total_pwen: Int = 0 {
         didSet {
-            etikètPwen.text = "Score: \(pwenTotal)"
+            lab_pwen.text = "Score: \(total_pwen)"
         }
     }
 
     // MARK: - Game States
-    enum EtaJwe {
-        case afichaj        // Showing tiles in sequence
-        case kontè          // Countdown timer
-        case melanje        // Shuffling tiles
-        case jwe            // Player selecting tiles
-        case rezilta        // Showing results
+    enum EtatJwe {
+        case afichaj
+        case kontè
+        case melanje
+        case jwe
+        case rezilta
     }
 
     // MARK: - Initialization
@@ -130,323 +128,313 @@ class JweViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        konfigireUI()
-        chajePwenTotal()
-        kòmanseJwe()
+        prepare_ui()
+        chaje_pwen()
+        komanse_jwe()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        kontèTan?.invalidate()
+        timatè?.invalidate()
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        // Update background gradient frame
         DynamicBackgroundFactory.updateBackgroundFrame(for: view)
         
-        // Update blur view frame in top bar
-        if let blurView = barAnwo.subviews.first as? UIVisualEffectView {
-            blurView.frame = barAnwo.bounds
+        if let blurView = bann_anwo.subviews.first as? UIVisualEffectView {
+            blurView.frame = bann_anwo.bounds
         }
     }
 
-    // MARK: - UI Configuration
-    private func konfigireUI() {
-        // Add dynamic animated background
+    // MARK: - UI Setup
+    private func prepare_ui() {
         DynamicBackgroundFactory.createAnimatedBackground(for: view)
         
         navigationController?.setNavigationBarHidden(true, animated: false)
 
-        view.addSubview(barAnwo)
-        barAnwo.addSubview(boutonRetounen)
-        barAnwo.addSubview(etikètNivo)
-        barAnwo.addSubview(etikètPwen)
+        view.addSubview(bann_anwo)
+        bann_anwo.addSubview(btn_retounen)
+        bann_anwo.addSubview(lab_nivo)
+        bann_anwo.addSubview(lab_pwen)
 
-        view.addSubview(etikètTan)
-        view.addSubview(etikètEnstriksyon)
-        view.addSubview(kontènèGrid)
+        view.addSubview(lab_tan)
+        view.addSubview(lab_enstriksyon)
+        view.addSubview(zone_grid)
 
-        etikètNivo.text = nivo.nonAfiche
-        etikètNivo.textColor = nivo.koulèPrènsipal
+        lab_nivo.text = nivo.nonAfiche
+        lab_nivo.textColor = nivo.koulèPrènsipal
 
-        boutonRetounen.addTarget(self, action: #selector(boutonRetounenTape), for: .touchUpInside)
+        btn_retounen.addTarget(self, action: #selector(ale_retounen), for: .touchUpInside)
 
-        konfigireKontrènt()
-        konfigireGrid()
+        monte_kontrènt()
+        monte_grid()
     }
 
-    private func konfigireKontrènt() {
-        let gwayidSekire = view.safeAreaLayoutGuide
+    private func monte_kontrènt() {
+        let safe = view.safeAreaLayoutGuide
 
         NSLayoutConstraint.activate([
-            barAnwo.topAnchor.constraint(equalTo: view.topAnchor),
-            barAnwo.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            barAnwo.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            barAnwo.bottomAnchor.constraint(equalTo: gwayidSekire.topAnchor, constant: 60),
+            bann_anwo.topAnchor.constraint(equalTo: view.topAnchor),
+            bann_anwo.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            bann_anwo.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            bann_anwo.bottomAnchor.constraint(equalTo: safe.topAnchor, constant: 60),
 
-            boutonRetounen.leadingAnchor.constraint(equalTo: barAnwo.leadingAnchor, constant: 16),
-            boutonRetounen.centerYAnchor.constraint(equalTo: barAnwo.bottomAnchor, constant: -20),
+            btn_retounen.leadingAnchor.constraint(equalTo: bann_anwo.leadingAnchor, constant: 16),
+            btn_retounen.centerYAnchor.constraint(equalTo: bann_anwo.bottomAnchor, constant: -20),
 
-            etikètNivo.centerXAnchor.constraint(equalTo: barAnwo.centerXAnchor),
-            etikètNivo.centerYAnchor.constraint(equalTo: boutonRetounen.centerYAnchor),
+            lab_nivo.centerXAnchor.constraint(equalTo: bann_anwo.centerXAnchor),
+            lab_nivo.centerYAnchor.constraint(equalTo: btn_retounen.centerYAnchor),
 
-            etikètPwen.trailingAnchor.constraint(equalTo: barAnwo.trailingAnchor, constant: -16),
-            etikètPwen.centerYAnchor.constraint(equalTo: boutonRetounen.centerYAnchor),
+            lab_pwen.trailingAnchor.constraint(equalTo: bann_anwo.trailingAnchor, constant: -16),
+            lab_pwen.centerYAnchor.constraint(equalTo: btn_retounen.centerYAnchor),
 
-            etikètTan.topAnchor.constraint(equalTo: barAnwo.bottomAnchor, constant: 20),
-            etikètTan.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            lab_tan.topAnchor.constraint(equalTo: bann_anwo.bottomAnchor, constant: 20),
+            lab_tan.centerXAnchor.constraint(equalTo: view.centerXAnchor),
 
-            etikètEnstriksyon.topAnchor.constraint(equalTo: etikètTan.bottomAnchor, constant: 8),
-            etikètEnstriksyon.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
-            etikètEnstriksyon.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30),
+            lab_enstriksyon.topAnchor.constraint(equalTo: lab_tan.bottomAnchor, constant: 8),
+            lab_enstriksyon.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
+            lab_enstriksyon.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30),
 
-            kontènèGrid.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            kontènèGrid.topAnchor.constraint(equalTo: etikètEnstriksyon.bottomAnchor, constant: 30)
+            zone_grid.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            zone_grid.topAnchor.constraint(equalTo: lab_enstriksyon.bottomAnchor, constant: 30)
         ])
     }
 
-    private func konfigireGrid() {
+    private func monte_grid() {
         let kolòn = nivo.kantiteKolòn
         let ranje = nivo.kantiteRanje
 
-        let lajèEkran = view.bounds.width
-        let otèEkran = view.bounds.height
-        let otèSekire = view.safeAreaInsets.top + view.safeAreaInsets.bottom
-        let otèDisponib = otèEkran - otèSekire - 300 // Reserve space for top bar, timer, and instructions
+        let lajè_ekran = view.bounds.width
+        let otè_ekran = view.bounds.height
+        let otè_safe = view.safeAreaInsets.top + view.safeAreaInsets.bottom
+        let otè_disponib = otè_ekran - otè_safe - 300
 
-        // Calculate maximum cell size based on available space
         let espasman: CGFloat = 12
-        let lajèDisponib = lajèEkran * 0.85
+        let lajè_disponib = lajè_ekran * 0.85
 
-        // Calculate cell width based on screen width
-        let lajèSekilParLajè = (lajèDisponib - (CGFloat(kolòn - 1) * espasman)) / CGFloat(kolòn)
+        let lajè_par_lajè = (lajè_disponib - (CGFloat(kolòn - 1) * espasman)) / CGFloat(kolòn)
 
-        // Calculate cell width based on screen height to prevent overflow
-        let otèMaxGrid = otèDisponib * 0.7 // Use 70% of available height
-        let otèSekilParOtè = (otèMaxGrid - (CGFloat(ranje - 1) * espasman)) / CGFloat(ranje) / 1.2
+        let otè_max = otè_disponib * 0.7
+        let otè_par_otè = (otè_max - (CGFloat(ranje - 1) * espasman)) / CGFloat(ranje) / 1.2
 
-        // Use the smaller of the two to ensure everything fits
-        let lajèSelil = min(lajèSekilParLajè, otèSekilParOtè)
-        let otèSelil = lajèSelil * 1.2
+        let lajè_selil = min(lajè_par_lajè, otè_par_otè)
+        let otè_selil = lajè_selil * 1.2
 
-        let lajèGridTotal = (lajèSelil * CGFloat(kolòn)) + (espasman * CGFloat(kolòn - 1))
-        let otèGridTotal = (otèSelil * CGFloat(ranje)) + (espasman * CGFloat(ranje - 1))
+        let lajè_total = (lajè_selil * CGFloat(kolòn)) + (espasman * CGFloat(kolòn - 1))
+        let otè_total = (otè_selil * CGFloat(ranje)) + (espasman * CGFloat(ranje - 1))
 
         NSLayoutConstraint.activate([
-            kontènèGrid.widthAnchor.constraint(equalToConstant: lajèGridTotal),
-            kontènèGrid.heightAnchor.constraint(equalToConstant: otèGridTotal)
+            zone_grid.widthAnchor.constraint(equalToConstant: lajè_total),
+            zone_grid.heightAnchor.constraint(equalToConstant: otè_total)
         ])
 
-        for ranjEndèks in 0..<ranje {
-            for kolònEndèks in 0..<kolòn {
+        for rang in 0..<ranje {
+            for kol in 0..<kolòn {
                 let selil = KatyoCellView()
                 selil.translatesAutoresizingMaskIntoConstraints = false
 
-                let tapGès = UITapGestureRecognizer(target: self, action: #selector(katyoTape(_:)))
-                selil.addGestureRecognizer(tapGès)
-                selil.tag = ranjEndèks * kolòn + kolònEndèks
+                let tap = UITapGestureRecognizer(target: self, action: #selector(tap_katyo(_:)))
+                selil.addGestureRecognizer(tap)
+                selil.tag = rang * kolòn + kol
 
-                kontènèGrid.addSubview(selil)
-                selilKatyo.append(selil)
+                zone_grid.addSubview(selil)
+                lis_selil.append(selil)
 
-                let x = CGFloat(kolònEndèks) * (lajèSelil + espasman)
-                let y = CGFloat(ranjEndèks) * (otèSelil + espasman)
+                let x = CGFloat(kol) * (lajè_selil + espasman)
+                let y = CGFloat(rang) * (otè_selil + espasman)
 
                 NSLayoutConstraint.activate([
-                    selil.leadingAnchor.constraint(equalTo: kontènèGrid.leadingAnchor, constant: x),
-                    selil.topAnchor.constraint(equalTo: kontènèGrid.topAnchor, constant: y),
-                    selil.widthAnchor.constraint(equalToConstant: lajèSelil),
-                    selil.heightAnchor.constraint(equalToConstant: otèSelil)
+                    selil.leadingAnchor.constraint(equalTo: zone_grid.leadingAnchor, constant: x),
+                    selil.topAnchor.constraint(equalTo: zone_grid.topAnchor, constant: y),
+                    selil.widthAnchor.constraint(equalToConstant: lajè_selil),
+                    selil.heightAnchor.constraint(equalToConstant: otè_selil)
                 ])
             }
         }
     }
 
     // MARK: - Game Logic
-    private func kòmanseJwe() {
-        katyoLis = JerèrKatyo.pataje.chwaziKatyoAleatwa(kantite: nivo.kantiteTotalKatyo)
-        orijinalSekans = katyoLis
-        seleksyonSekans = []
-        endèksSeleksyonAktiyèl = 0
+    private func komanse_jwe() {
+        lis_katyo = JerèrKatyo.pataje.chwaziKatyoAleatwa(kantite: nivo.kantiteTotalKatyo)
+        sekans_orijinal = lis_katyo
+        sekans_chwa = []
+        endèks_aktyèl = 0
 
-        etaJwe = .afichaj
-        aficheSekansKatyo()
+        eta_aktyèl = .afichaj
+        montre_sekans()
     }
 
-    private func aficheSekansKatyo() {
-        etikètEnstriksyon.text = "Memorize the tiles..."
-        etikètTan.isHidden = true
+    private func montre_sekans() {
+        lab_enstriksyon.text = "Memorize the tiles..."
+        lab_tan.isHidden = true
 
-        for (endèks, selil) in selilKatyo.enumerated() {
-            selil.konfigire(ak: katyoLis[endèks])
-            selil.animeEntransAk(TimeInterval(endèks) * 0.15)
+        for (idx, selil) in lis_selil.enumerated() {
+            selil.konfigire(ak: lis_katyo[idx])
+            selil.animeEntransAk(TimeInterval(idx) * 0.15)
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + Double(selilKatyo.count) * 0.15 + 0.5) {
-            self.kòmanseKontè()
+        DispatchQueue.main.asyncAfter(deadline: .now() + Double(lis_selil.count) * 0.15 + 0.5) {
+            self.komanse_kont()
         }
     }
 
-    private func kòmanseKontè() {
-        etaJwe = .kontè
-        tanRestan = 10
-        etikètTan.isHidden = false
-        etikètEnstriksyon.text = "Remember the order!"
+    private func komanse_kont() {
+        eta_aktyèl = .kontè
+        tan_ki_rete = 10
+        lab_tan.isHidden = false
+        lab_enstriksyon.text = "Remember the order!"
 
-        mizeAjouAfichajTan()
+        ajou_tan()
 
-        kontèTan = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+        timatè = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             guard let self = self else { return }
 
-            self.tanRestan -= 1
-            self.mizeAjouAfichajTan()
+            self.tan_ki_rete -= 1
+            self.ajou_tan()
 
-            if self.tanRestan == 5 {
-                self.melanjeKatyo()
+            if self.tan_ki_rete == 5 {
+                self.melanje()
             }
 
-            if self.tanRestan <= 0 {
-                self.kontèTan?.invalidate()
-                self.kòmanseJwePhase()
+            if self.tan_ki_rete <= 0 {
+                self.timatè?.invalidate()
+                self.komanse_fas_jwe()
             }
         }
     }
 
-    private func mizeAjouAfichajTan() {
-        etikètTan.text = "\(tanRestan)"
+    private func ajou_tan() {
+        lab_tan.text = "\(tan_ki_rete)"
 
-        if tanRestan <= 5 {
-            etikètTan.textColor = DesignColors.accentGradientStart
+        if tan_ki_rete <= 5 {
+            lab_tan.textColor = DesignColors.accentGradientStart
 
             AnimationUtilities.springAnimation(duration: 0.4, damping: 0.5, velocity: 0.8, animations: {
-                self.etikètTan.transform = CGAffineTransform(scaleX: 1.15, y: 1.15)
+                self.lab_tan.transform = CGAffineTransform(scaleX: 1.15, y: 1.15)
             }) { _ in
                 AnimationUtilities.springAnimation(duration: 0.3, animations: {
-                    self.etikètTan.transform = .identity
+                    self.lab_tan.transform = .identity
                 })
             }
         } else {
-            etikètTan.textColor = DesignColors.primaryGradientStart
+            lab_tan.textColor = DesignColors.primaryGradientStart
         }
     }
 
-    private func melanjeKatyo() {
-        etaJwe = .melanje
-        katyoLis = JerèrKatyo.pataje.melanje(katyoLis)
+    private func melanje() {
+        eta_aktyèl = .melanje
+        lis_katyo = JerèrKatyo.pataje.melanje(lis_katyo)
 
         UIView.animate(withDuration: 0.3) {
-            self.selilKatyo.forEach { $0.alpha = 0 }
+            self.lis_selil.forEach { $0.alpha = 0 }
         } completion: { _ in
-            for (endèks, selil) in self.selilKatyo.enumerated() {
-                selil.konfigire(ak: self.katyoLis[endèks])
+            for (idx, selil) in self.lis_selil.enumerated() {
+                selil.konfigire(ak: self.lis_katyo[idx])
             }
 
             UIView.animate(withDuration: 0.3) {
-                self.selilKatyo.forEach { $0.alpha = 1 }
+                self.lis_selil.forEach { $0.alpha = 1 }
             }
         }
     }
 
-    private func kòmanseJwePhase() {
-        etaJwe = .jwe
-        etikètTan.isHidden = true
-        etikètEnstriksyon.text = "Select tiles in the correct order!"
+    private func komanse_fas_jwe() {
+        eta_aktyèl = .jwe
+        lab_tan.isHidden = true
+        lab_enstriksyon.text = "Select tiles in the correct order!"
     }
 
-    private func mizeAjouPouEtaJwe() {
-        switch etaJwe {
+    private func mete_ajou_pou_eta() {
+        switch eta_aktyèl {
         case .afichaj:
-            kontènèGrid.isUserInteractionEnabled = false
+            zone_grid.isUserInteractionEnabled = false
         case .kontè:
-            kontènèGrid.isUserInteractionEnabled = false
+            zone_grid.isUserInteractionEnabled = false
         case .melanje:
-            kontènèGrid.isUserInteractionEnabled = false
+            zone_grid.isUserInteractionEnabled = false
         case .jwe:
-            kontènèGrid.isUserInteractionEnabled = true
+            zone_grid.isUserInteractionEnabled = true
         case .rezilta:
-            kontènèGrid.isUserInteractionEnabled = false
+            zone_grid.isUserInteractionEnabled = false
         }
     }
 
     // MARK: - User Interaction
-    @objc private func katyoTape(_ jès: UITapGestureRecognizer) {
-        guard etaJwe == .jwe, let selil = jès.view as? KatyoCellView else { return }
+    @objc private func tap_katyo(_ gesture: UITapGestureRecognizer) {
+        guard eta_aktyèl == .jwe, let selil = gesture.view as? KatyoCellView else { return }
 
-        let endèks = selil.tag
-        let katyoSeleksyone = katyoLis[endèks]
+        let idx = selil.tag
+        let katyo_chwa = lis_katyo[idx]
 
-        if endèksSeleksyonAktiyèl < orijinalSekans.count {
-            let katyoKòrèk = orijinalSekans[endèksSeleksyonAktiyèl]
+        if endèks_aktyèl < sekans_orijinal.count {
+            let katyo_korrèk = sekans_orijinal[endèks_aktyèl]
 
-            if katyoSeleksyone == katyoKòrèk {
-                // Correct selection
+            if katyo_chwa == katyo_korrèk {
                 selil.animeSeleksyon()
-                selil.aficheNimewo(endèksSeleksyonAktiyèl + 1)
-                seleksyonSekans.append(katyoSeleksyone)
-                endèksSeleksyonAktiyèl += 1
+                selil.aficheNimewo(endèks_aktyèl + 1)
+                sekans_chwa.append(katyo_chwa)
+                endèks_aktyèl += 1
 
-                if endèksSeleksyonAktiyèl == orijinalSekans.count {
-                    // All correct!
-                    jenereSiyès()
+                if endèks_aktyèl == sekans_orijinal.count {
+                    jenere_siyès()
                 }
             } else {
-                // Wrong selection
                 selil.animeErè()
-                jenereEchèk()
+                jenere_echèk()
             }
         }
     }
 
-    @objc private func boutonRetounenTape() {
+    @objc private func ale_retounen() {
         navigationController?.popViewController(animated: true)
     }
 
-    // MARK: - Game Results
-    private func jenereSiyès() {
-        etaJwe = .rezilta
+    // MARK: - Results
+    private func jenere_siyès() {
+        eta_aktyèl = .rezilta
 
-        let pwenBaz = 50
-        let kontreSesyon = JerèrPwen.pataje.jwennKontreSesyonSiyès()
-        let pwenBonus = JerèrPwen.pataje.kalkilePwenBonus()
+        let pwen_baz = 50
+        let kontrè_sesyon = JerèrPwen.pataje.jwennKontreSesyonSiyès()
+        let pwen_bonus = JerèrPwen.pataje.kalkilePwenBonus()
 
         JerèrPwen.pataje.ogmanteKontreSesyonSiyès()
 
-        let pwenTotal = pwenBaz + pwenBonus
-        self.pwenTotal += pwenTotal
+        let pwen_total = pwen_baz + pwen_bonus
+        self.total_pwen += pwen_total
 
-        JerèrPwen.pataje.konsève(self.pwenTotal, pou: nivo)
+        JerèrPwen.pataje.konsève(self.total_pwen, pou: nivo)
 
         var mesaj = "You completed the challenge!"
-        if kontreSesyon >= 2 {
-            mesaj += "\n\n🔥 \(kontreSesyon + 1) wins in a row!"
-            if pwenBonus > 0 {
-                mesaj += "\nBonus: +\(pwenBonus) points"
+        if kontrè_sesyon >= 2 {
+            mesaj += "\n\n🔥 \(kontrè_sesyon + 1) wins in a row!"
+            if pwen_bonus > 0 {
+                mesaj += "\nBonus: +\(pwen_bonus) points"
             }
         }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            BoitDyalògPèsonalize.aficheSiyès(nan: self.view, mesaj: mesaj, pwen: pwenTotal) {
-                self.kòmanseJwe()
+            BoitDyalògPèsonalize.aficheSiyès(nan: self.view, mesaj: mesaj, pwen: pwen_total) {
+                self.komanse_jwe()
             }
         }
     }
 
-    private func jenereEchèk() {
-        etaJwe = .rezilta
+    private func jenere_echèk() {
+        eta_aktyèl = .rezilta
         JerèrPwen.pataje.reyinisilizeKontreSesyonSiyès()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             BoitDyalògPèsonalize.aficheEchèk(nan: self.view, mesaj: "Wrong tile selected!\nTry again.") {
-                self.kòmanseJwe()
+                self.komanse_jwe()
             }
         }
     }
 
-    private func chajePwenTotal() {
-        let anrejistreman = JerèrPwen.pataje.chajeToutAnrejistreman()
-        let filtreNivo = anrejistreman.filter { $0.nivo == nivo }
-        pwenTotal = filtreNivo.reduce(0) { $0 + $1.pwen }
+    private func chaje_pwen() {
+        let anrej = JerèrPwen.pataje.chajeToutAnrejistreman()
+        let filtre = anrej.filter { $0.nivo == nivo }
+        total_pwen = filtre.reduce(0) { $0 + $1.pwen }
     }
 }

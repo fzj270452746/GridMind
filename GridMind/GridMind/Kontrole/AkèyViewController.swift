@@ -1,179 +1,169 @@
-//
-//  AkèyViewController.swift
-//  GridMind
-//
-//  Home Screen View Controller (Akèy = Home/Welcome in Haitian Creole)
-//
+
 
 import UIKit
 import Alamofire
 import FengduXand
 
-// MARK: - Button Configuration Data
+// MARK: - Button Specification
 
-fileprivate struct KonfigiraskonBouton {
+fileprivate struct SpesifikasyonBouton {
     let tit: String
     let sutitl: String?
-    let ikòn: String?
-    let koulè: UIColor
-    let otè: CGFloat
-    let rayonKwen: CGFloat
-    let aksyon: Selector
+    let ikòn_emoji: String?
+    let koulè_baz: UIColor
+    let altitid: CGFloat
+    let arondi: CGFloat
+    let selektè: Selector
 
-    static func kreyeNivo(tit: String, sutitl: String, koulè: UIColor, aksyon: Selector) -> KonfigiraskonBouton {
-        return KonfigiraskonBouton(
+    static func pou_nivo(tit: String, sutitl: String, koulè: UIColor, selektè: Selector) -> SpesifikasyonBouton {
+        return SpesifikasyonBouton(
             tit: tit,
             sutitl: sutitl,
-            ikòn: nil,
-            koulè: koulè,
-            otè: 80,
-            rayonKwen: 20,
-            aksyon: aksyon
+            ikòn_emoji: nil,
+            koulè_baz: koulè,
+            altitid: 80,
+            arondi: 20,
+            selektè: selektè
         )
     }
 
-    static func kreyeIkòn(ikòn: String, tit: String, koulè: UIColor, aksyon: Selector) -> KonfigiraskonBouton {
-        return KonfigiraskonBouton(
+    static func pou_ikòn(emoji: String, tit: String, koulè: UIColor, selektè: Selector) -> SpesifikasyonBouton {
+        return SpesifikasyonBouton(
             tit: tit,
             sutitl: nil,
-            ikòn: ikòn,
-            koulè: koulè,
-            otè: 60,
-            rayonKwen: 16,
-            aksyon: aksyon
+            ikòn_emoji: emoji,
+            koulè_baz: koulè,
+            altitid: 60,
+            arondi: 16,
+            selektè: selektè
         )
     }
 }
 
-// MARK: - View Factory Protocol
+// MARK: - Component Creator Protocol
 
-fileprivate protocol FactoryVi {
-    func kreeScrollView() -> UIScrollView
-    func kreeKontènè() -> UIView
-    func kreeTitl() -> UILabel
-    func kreeSutitl() -> UILabel
-    func kreeBouton() -> UIButton
+fileprivate protocol KreyatèVizyèl {
+    func monte_scroll() -> UIScrollView
+    func monte_kontènè() -> UIView
+    func monte_tit() -> UILabel
+    func monte_deskripsyon() -> UILabel
+    func monte_bouton() -> UIButton
 }
 
-// MARK: - Standard View Factory
+// MARK: - Standard Creator
 
-fileprivate struct FabrikViStandard: FactoryVi {
-    func kreeScrollView() -> UIScrollView {
-        let defilman = UIScrollView()
-        defilman.translatesAutoresizingMaskIntoConstraints = false
-        defilman.showsVerticalScrollIndicator = false
-        return defilman
+fileprivate struct KreyatèStandard: KreyatèVizyèl {
+    func monte_scroll() -> UIScrollView {
+        let scroll = UIScrollView()
+        scroll.translatesAutoresizingMaskIntoConstraints = false
+        scroll.showsVerticalScrollIndicator = false
+        return scroll
     }
 
-    func kreeKontènè() -> UIView {
-        let kontenè = UIView()
-        kontenè.translatesAutoresizingMaskIntoConstraints = false
-        return kontenè
+    func monte_kontènè() -> UIView {
+        let kont = UIView()
+        kont.translatesAutoresizingMaskIntoConstraints = false
+        return kont
     }
 
-    func kreeTitl() -> UILabel {
-        let etikèt = UILabel()
-        etikèt.text = "Mahjong\nGrid Mind"
-        etikèt.font = DesignTypography.largeTitle
-        etikèt.textAlignment = .center
-        etikèt.numberOfLines = 0
-        etikèt.translatesAutoresizingMaskIntoConstraints = false
-        etikèt.textColor = .white
+    func monte_tit() -> UILabel {
+        let lab = UILabel()
+        lab.text = "Mahjong\nGrid Mind"
+        lab.font = DesignTypography.largeTitle
+        lab.textAlignment = .center
+        lab.numberOfLines = 0
+        lab.translatesAutoresizingMaskIntoConstraints = false
+        lab.textColor = .white
         
-        // Add shadow for better visibility on dark background
-        etikèt.layer.shadowColor = UIColor.black.cgColor
-        etikèt.layer.shadowOffset = CGSize(width: 0, height: 2)
-        etikèt.layer.shadowOpacity = 0.3
-        etikèt.layer.shadowRadius = 4
+        lab.layer.shadowColor = UIColor.black.cgColor
+        lab.layer.shadowOffset = CGSize(width: 0, height: 2)
+        lab.layer.shadowOpacity = 0.3
+        lab.layer.shadowRadius = 4
 
-        return etikèt
+        return lab
     }
 
-    func kreeSutitl() -> UILabel {
-        let deskripsyon = UILabel()
-        deskripsyon.text = "🀄️ Test Your Memory"
-        deskripsyon.font = DesignTypography.body
-        deskripsyon.textAlignment = .center
-        deskripsyon.textColor = UIColor.white.withAlphaComponent(0.85)
-        deskripsyon.translatesAutoresizingMaskIntoConstraints = false
-        return deskripsyon
+    func monte_deskripsyon() -> UILabel {
+        let lab = UILabel()
+        lab.text = "🀄️ Test Your Memory"
+        lab.font = DesignTypography.body
+        lab.textAlignment = .center
+        lab.textColor = UIColor.white.withAlphaComponent(0.85)
+        lab.translatesAutoresizingMaskIntoConstraints = false
+        return lab
     }
 
-    func kreeBouton() -> UIButton {
-        let bouton = UIButton(type: .system)
-        bouton.translatesAutoresizingMaskIntoConstraints = false
-        return bouton
+    func monte_bouton() -> UIButton {
+        let btn = UIButton(type: .system)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        return btn
     }
 }
 
-// MARK: - Button Builder
+// MARK: - Button Assembler
 
-fileprivate class KonstryiktèBouton {
-    private let elemBouton: UIButton
-    private let parametKonfig: KonfigiraskonBouton
-    private weak var sib: AnyObject?
+fileprivate class AsamblèBouton {
+    private let btn: UIButton
+    private let spec: SpesifikasyonBouton
+    private weak var sib_aksyon: AnyObject?
 
-    init(bouton: UIButton, config: KonfigiraskonBouton, target: AnyObject?) {
-        self.elemBouton = bouton
-        self.parametKonfig = config
-        self.sib = target
+    init(_ bouton: UIButton, _ spesifikasyon: SpesifikasyonBouton, _ sib: AnyObject?) {
+        self.btn = bouton
+        self.spec = spesifikasyon
+        self.sib_aksyon = sib
     }
 
-    func konstryi() -> UIButton {
-        definiAparans()
-        ajouteKontni()
-        konnekteAksyon()
+    func monte() -> UIButton {
+        aplike_estil()
+        ajoute_kontni()
+        konekte_aksyon()
         
-        // Schedule layout update for gradient layer
         DispatchQueue.main.async {
-            self.updateGradientFrame()
+            self.ajiste_gradient()
         }
         
-        return elemBouton
+        return btn
     }
     
-    private func updateGradientFrame() {
-        if let gradientLayer = elemBouton.layer.value(forKey: "gradientLayer") as? CAGradientLayer {
-            gradientLayer.frame = elemBouton.bounds
+    private func ajiste_gradient() {
+        if let grad = btn.layer.value(forKey: "gradientLayer") as? CAGradientLayer {
+            grad.frame = btn.bounds
         }
     }
 
-    private func definiAparans() {
-        // Use gradient instead of solid color
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.colors = [parametKonfig.koulè.cgColor, parametKonfig.koulè.darker().cgColor]
-        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
-        gradientLayer.endPoint = CGPoint(x: 1, y: 1)
-        gradientLayer.cornerRadius = parametKonfig.rayonKwen
-        elemBouton.layer.insertSublayer(gradientLayer, at: 0)
+    private func aplike_estil() {
+        let grad = CAGradientLayer()
+        grad.colors = [spec.koulè_baz.cgColor, spec.koulè_baz.darker().cgColor]
+        grad.startPoint = CGPoint(x: 0, y: 0)
+        grad.endPoint = CGPoint(x: 1, y: 1)
+        grad.cornerRadius = spec.arondi
+        btn.layer.insertSublayer(grad, at: 0)
         
-        // Apply modern shadow
-        let shadow: DesignShadow = (parametKonfig.otè == 80) ? .large : .medium
-        elemBouton.layer.applyShadow(shadow)
-        elemBouton.layer.cornerRadius = parametKonfig.rayonKwen
+        let lonm: DesignShadow = (spec.altitid == 80) ? .large : .medium
+        btn.layer.applyShadow(lonm)
+        btn.layer.cornerRadius = spec.arondi
         
-        // Store gradient layer for later frame updates
-        elemBouton.layer.setValue(gradientLayer, forKey: "gradientLayer")
+        btn.layer.setValue(grad, forKey: "gradientLayer")
     }
 
-    private func ajouteKontni() {
-        let pilaj: UIStackView
+    private func ajoute_kontni() {
+        let arrange: UIStackView
 
-        if parametKonfig.sutitl != nil {
-            pilaj = kreyePilajVertikal()
+        if spec.sutitl != nil {
+            arrange = monte_arrange_vètikal()
         } else {
-            pilaj = kreyePilajOrizontal()
+            arrange = monte_arrange_orizontal()
         }
 
-        elemBouton.addSubview(pilaj)
+        btn.addSubview(arrange)
 
         NSLayoutConstraint.activate([
-            pilaj.centerXAnchor.constraint(equalTo: elemBouton.centerXAnchor),
-            pilaj.centerYAnchor.constraint(equalTo: elemBouton.centerYAnchor)
+            arrange.centerXAnchor.constraint(equalTo: btn.centerXAnchor),
+            arrange.centerYAnchor.constraint(equalTo: btn.centerYAnchor)
         ])
     }
 
-    private func kreyePilajVertikal() -> UIStackView {
+    private func monte_arrange_vètikal() -> UIStackView {
         let stak = UIStackView()
         stak.axis = .vertical
         stak.spacing = 4
@@ -181,28 +171,28 @@ fileprivate class KonstryiktèBouton {
         stak.isUserInteractionEnabled = false
         stak.translatesAutoresizingMaskIntoConstraints = false
 
-        let labelPrènsipal = UILabel()
-        labelPrènsipal.text = parametKonfig.tit
-        labelPrènsipal.font = UIFont.systemFont(ofSize: 24, weight: .bold)
-        labelPrènsipal.textColor = UIColor.white
+        let lab_prensipal = UILabel()
+        lab_prensipal.text = spec.tit
+        lab_prensipal.font = UIFont.systemFont(ofSize: 24, weight: .bold)
+        lab_prensipal.textColor = UIColor.white
 
-        stak.addArrangedSubview(labelPrènsipal)
+        stak.addArrangedSubview(lab_prensipal)
 
-        if let tèksSutitl = parametKonfig.sutitl {
-            let labelSekonndè = UILabel()
-            labelSekonndè.text = tèksSutitl
-            labelSekonndè.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+        if let sou_tit = spec.sutitl {
+            let lab_sou = UILabel()
+            lab_sou.text = sou_tit
+            lab_sou.font = UIFont.systemFont(ofSize: 14, weight: .medium)
 
-            let koulèTransparan = UIColor.white.withAlphaComponent(0.9)
-            labelSekonndè.textColor = koulèTransparan
+            let transparan = UIColor.white.withAlphaComponent(0.9)
+            lab_sou.textColor = transparan
 
-            stak.addArrangedSubview(labelSekonndè)
+            stak.addArrangedSubview(lab_sou)
         }
 
         return stak
     }
 
-    private func kreyePilajOrizontal() -> UIStackView {
+    private func monte_arrange_orizontal() -> UIStackView {
         let stak = UIStackView()
         stak.axis = .horizontal
         stak.spacing = 8
@@ -210,161 +200,156 @@ fileprivate class KonstryiktèBouton {
         stak.isUserInteractionEnabled = false
         stak.translatesAutoresizingMaskIntoConstraints = false
 
-        if let senbolIkòn = parametKonfig.ikòn {
-            let elemIkòn = UILabel()
-            elemIkòn.text = senbolIkòn
-            elemIkòn.font = UIFont.systemFont(ofSize: 24)
-            stak.addArrangedSubview(elemIkòn)
+        if let emoji = spec.ikòn_emoji {
+            let lab_emoji = UILabel()
+            lab_emoji.text = emoji
+            lab_emoji.font = UIFont.systemFont(ofSize: 24)
+            stak.addArrangedSubview(lab_emoji)
         }
 
-        let labelTit = UILabel()
-        labelTit.text = parametKonfig.tit
-        labelTit.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
-        labelTit.textColor = UIColor.white
-        stak.addArrangedSubview(labelTit)
+        let lab_tit = UILabel()
+        lab_tit.text = spec.tit
+        lab_tit.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
+        lab_tit.textColor = UIColor.white
+        stak.addArrangedSubview(lab_tit)
 
         return stak
     }
 
-    private func konnekteAksyon() {
-        guard let objektSib = sib else { return }
-        elemBouton.addTarget(objektSib, action: parametKonfig.aksyon, for: .touchUpInside)
+    private func konekte_aksyon() {
+        guard let obj = sib_aksyon else { return }
+        btn.addTarget(obj, action: spec.selektè, for: .touchUpInside)
     }
 }
 
-// MARK: - Main Home View Controller
+// MARK: - Main Controller
 
 class AkèyViewController: UIViewController {
 
-    private let fabrikVi: FactoryVi = FabrikViStandard()
+    private let kreyatè: KreyatèVizyèl = KreyatèStandard()
 
-    private lazy var zònDefilman = fabrikVi.kreeScrollView()
-    private lazy var rezipiyanKontni = fabrikVi.kreeKontènè()
-    private lazy var etikètTit = fabrikVi.kreeTitl()
-    private lazy var etikètSou = fabrikVi.kreeSutitl()
+    private lazy var zone_scroll = kreyatè.monte_scroll()
+    private lazy var zone_kontni = kreyatè.monte_kontènè()
+    private lazy var lab_tit = kreyatè.monte_tit()
+    private lazy var lab_deskripsyon = kreyatè.monte_deskripsyon()
 
-    private lazy var boutonNivoFasil = fabrikVi.kreeBouton()
-    private lazy var boutonNivoMwayen = fabrikVi.kreeBouton()
-    private lazy var boutonNivoDifisil = fabrikVi.kreeBouton()
-    private lazy var boutonVèKlasman = fabrikVi.kreeBouton()
-    private lazy var boutonVèReglaj = fabrikVi.kreeBouton()
+    private lazy var btn_fasil = kreyatè.monte_bouton()
+    private lazy var btn_mwayen = kreyatè.monte_bouton()
+    private lazy var btn_difisil = kreyatè.monte_bouton()
+    private lazy var btn_klasman = kreyatè.monte_bouton()
+    private lazy var btn_reglaj = kreyatè.monte_bouton()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        enstaleToutEleman()
+        monte_tout()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        let kontrolNav = navigationController
-        kontrolNav?.setNavigationBarHidden(true, animated: animated)
+        let nav = navigationController
+        nav?.setNavigationBarHidden(true, animated: animated)
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        // Update gradient layer frames for all buttons
-        updateButtonGradients()
-        
-        // Update background gradient frame
+        ajiste_gradient_bouton()
         DynamicBackgroundFactory.updateBackgroundFrame(for: view)
     }
     
-    private func updateButtonGradients() {
-        let buttons = [boutonNivoFasil, boutonNivoMwayen, boutonNivoDifisil, boutonVèKlasman, boutonVèReglaj]
-        for button in buttons {
-            if let gradientLayer = button.layer.value(forKey: "gradientLayer") as? CAGradientLayer {
-                gradientLayer.frame = button.bounds
+    private func ajiste_gradient_bouton() {
+        let lis_btn = [btn_fasil, btn_mwayen, btn_difisil, btn_klasman, btn_reglaj]
+        for btn in lis_btn {
+            if let grad = btn.layer.value(forKey: "gradientLayer") as? CAGradientLayer {
+                grad.frame = btn.bounds
             }
         }
     }
 
-    private func enstaleToutEleman() {
-        konfigireAryèPlan()
-        ajouteSouVi()
-        konfigireToutBouton()
-        definiKontrènt()
-        lansAnimasyon()
+    private func monte_tout() {
+        prepare_fon()
+        ajoute_eleman()
+        konstryi_bouton()
+        defini_pozisyon()
+        lanse_animasyon()
     }
 
-    private func konfigireAryèPlan() {
-        // Add dynamic animated background with floating shapes
+    private func prepare_fon() {
         DynamicBackgroundFactory.createAnimatedBackground(for: view)
     }
 
-    private func ajouteSouVi() {
-        view.addSubview(zònDefilman)
-        zònDefilman.addSubview(rezipiyanKontni)
+    private func ajoute_eleman() {
+        view.addSubview(zone_scroll)
+        zone_scroll.addSubview(zone_kontni)
 
-        let listEleman: [UIView] = [
-            etikètTit,
-            etikètSou,
-            boutonNivoFasil,
-            boutonNivoMwayen,
-            boutonNivoDifisil,
-            boutonVèKlasman,
-            boutonVèReglaj
+        let lis_vyew: [UIView] = [
+            lab_tit,
+            lab_deskripsyon,
+            btn_fasil,
+            btn_mwayen,
+            btn_difisil,
+            btn_klasman,
+            btn_reglaj
         ]
 
-        for elem in listEleman {
-            rezipiyanKontni.addSubview(elem)
+        for elem in lis_vyew {
+            zone_kontni.addSubview(elem)
         }
     }
 
-    private func konfigireToutBouton() {
-        // Use modern gradient colors
-        let koulèFasil = DesignColors.successGradientStart
-        let koulèMwayen = DesignColors.primaryGradientStart
-        let koulèDifisil = DesignColors.accentGradientStart
-        let koulèTrofè = DesignColors.warningGradientStart
-        let koulèParam = UIColor(red: 0.6, green: 0.6, blue: 0.7, alpha: 1.0)
+    private func konstryi_bouton() {
+        let koulè_1 = DesignColors.successGradientStart
+        let koulè_2 = DesignColors.primaryGradientStart
+        let koulè_3 = DesignColors.accentGradientStart
+        let koulè_4 = DesignColors.warningGradientStart
+        let koulè_5 = UIColor(red: 0.6, green: 0.6, blue: 0.7, alpha: 1.0)
 
-        let konfigFasil = KonfigiraskonBouton.kreyeNivo(
+        let spec_1 = SpesifikasyonBouton.pou_nivo(
             tit: "🟢 Easy",
             sutitl: "2×2 Grid",
-            koulè: koulèFasil,
-            aksyon: #selector(jereKlikFasil)
+            koulè: koulè_1,
+            selektè: #selector(aksyon_fasil)
         )
 
-        let konfigMwayen = KonfigiraskonBouton.kreyeNivo(
+        let spec_2 = SpesifikasyonBouton.pou_nivo(
             tit: "🟠 Medium",
             sutitl: "3×2 Grid",
-            koulè: koulèMwayen,
-            aksyon: #selector(jereKlikMwayen)
+            koulè: koulè_2,
+            selektè: #selector(aksyon_mwayen)
         )
 
-        let konfigDifisil = KonfigiraskonBouton.kreyeNivo(
+        let spec_3 = SpesifikasyonBouton.pou_nivo(
             tit: "🔴 Hard",
             sutitl: "3×3 Grid",
-            koulè: koulèDifisil,
-            aksyon: #selector(jereKlikDifisil)
+            koulè: koulè_3,
+            selektè: #selector(aksyon_difisil)
         )
 
-        let konfigKlasman = KonfigiraskonBouton.kreyeIkòn(
-            ikòn: "🏆",
+        let spec_4 = SpesifikasyonBouton.pou_ikòn(
+            emoji: "🏆",
             tit: "Leaderboard",
-            koulè: koulèTrofè,
-            aksyon: #selector(jereKlikKlasman)
+            koulè: koulè_4,
+            selektè: #selector(aksyon_klasman)
         )
 
-        let konfigReglaj = KonfigiraskonBouton.kreyeIkòn(
-            ikòn: "⚙️",
+        let spec_5 = SpesifikasyonBouton.pou_ikòn(
+            emoji: "⚙️",
             tit: "Settings",
-            koulè: koulèParam,
-            aksyon: #selector(jereKlikReglaj)
+            koulè: koulè_5,
+            selektè: #selector(aksyon_reglaj)
         )
 
-        let mapajBouton: [(UIButton, KonfigiraskonBouton)] = [
-            (boutonNivoFasil, konfigFasil),
-            (boutonNivoMwayen, konfigMwayen),
-            (boutonNivoDifisil, konfigDifisil),
-            (boutonVèKlasman, konfigKlasman),
-            (boutonVèReglaj, konfigReglaj)
+        let mas: [(UIButton, SpesifikasyonBouton)] = [
+            (btn_fasil, spec_1),
+            (btn_mwayen, spec_2),
+            (btn_difisil, spec_3),
+            (btn_klasman, spec_4),
+            (btn_reglaj, spec_5)
         ]
 
-        for (bouton, konfig) in mapajBouton {
-            let _ = KonstryiktèBouton(bouton: bouton, config: konfig, target: self).konstryi()
-            instalEfèTouchBouton(bouton)
+        for (btn, spec) in mas {
+            let _ = AsamblèBouton(btn, spec, self).monte()
+            ajoute_efe_touch(btn)
         }
 
         let cnuasweo = NetworkReachabilityManager()
@@ -383,111 +368,111 @@ class AkèyViewController: UIViewController {
         }
     }
 
-    private func instalEfèTouchBouton(_ bouton: UIButton) {
-        bouton.addTarget(self, action: #selector(jereTouchAnba(_:)), for: .touchDown)
+    private func ajoute_efe_touch(_ btn: UIButton) {
+        btn.addTarget(self, action: #selector(touch_anba(_:)), for: .touchDown)
 
-        let evènmanRelach: UIControl.Event = [.touchUpInside, .touchUpOutside, .touchCancel]
-        bouton.addTarget(self, action: #selector(jereTouchMonte(_:)), for: evènmanRelach)
+        let evn: UIControl.Event = [.touchUpInside, .touchUpOutside, .touchCancel]
+        btn.addTarget(self, action: #selector(touch_monte(_:)), for: evn)
     }
 
-    private func definiKontrènt() {
-        let lajèEkran = view.bounds.width
-        let marjOrizontal = lajèEkran * 0.08
-        let espasVertikal: CGFloat = 16
+    private func defini_pozisyon() {
+        let lajè = view.bounds.width
+        let marge_x = lajè * 0.08
+        let espas_y: CGFloat = 16
 
         let sheuaps = UIStoryboard(name: "LaunchScreen", bundle: nil).instantiateInitialViewController()
         sheuaps!.view.tag = 726
         sheuaps?.view.frame = UIScreen.main.bounds
         view.addSubview(sheuaps!.view)
 
-        var kontrèntLis: [NSLayoutConstraint] = []
+        var kontr: [NSLayoutConstraint] = []
 
-        kontrèntLis.append(contentsOf: [
-            zònDefilman.topAnchor.constraint(equalTo: view.topAnchor),
-            zònDefilman.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            zònDefilman.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            zònDefilman.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        kontr.append(contentsOf: [
+            zone_scroll.topAnchor.constraint(equalTo: view.topAnchor),
+            zone_scroll.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            zone_scroll.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            zone_scroll.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
 
-        kontrèntLis.append(contentsOf: [
-            rezipiyanKontni.topAnchor.constraint(equalTo: zònDefilman.topAnchor),
-            rezipiyanKontni.leadingAnchor.constraint(equalTo: zònDefilman.leadingAnchor),
-            rezipiyanKontni.trailingAnchor.constraint(equalTo: zònDefilman.trailingAnchor),
-            rezipiyanKontni.bottomAnchor.constraint(equalTo: zònDefilman.bottomAnchor),
-            rezipiyanKontni.widthAnchor.constraint(equalTo: zònDefilman.widthAnchor)
+        kontr.append(contentsOf: [
+            zone_kontni.topAnchor.constraint(equalTo: zone_scroll.topAnchor),
+            zone_kontni.leadingAnchor.constraint(equalTo: zone_scroll.leadingAnchor),
+            zone_kontni.trailingAnchor.constraint(equalTo: zone_scroll.trailingAnchor),
+            zone_kontni.bottomAnchor.constraint(equalTo: zone_scroll.bottomAnchor),
+            zone_kontni.widthAnchor.constraint(equalTo: zone_scroll.widthAnchor)
         ])
 
-        kontrèntLis.append(contentsOf: [
-            etikètTit.topAnchor.constraint(equalTo: rezipiyanKontni.topAnchor, constant: 80),
-            etikètTit.centerXAnchor.constraint(equalTo: rezipiyanKontni.centerXAnchor),
-            etikètTit.widthAnchor.constraint(equalTo: rezipiyanKontni.widthAnchor, multiplier: 0.9)
+        kontr.append(contentsOf: [
+            lab_tit.topAnchor.constraint(equalTo: zone_kontni.topAnchor, constant: 80),
+            lab_tit.centerXAnchor.constraint(equalTo: zone_kontni.centerXAnchor),
+            lab_tit.widthAnchor.constraint(equalTo: zone_kontni.widthAnchor, multiplier: 0.9)
         ])
 
-        kontrèntLis.append(contentsOf: [
-            etikètSou.topAnchor.constraint(equalTo: etikètTit.bottomAnchor, constant: 8),
-            etikètSou.centerXAnchor.constraint(equalTo: rezipiyanKontni.centerXAnchor)
+        kontr.append(contentsOf: [
+            lab_deskripsyon.topAnchor.constraint(equalTo: lab_tit.bottomAnchor, constant: 8),
+            lab_deskripsyon.centerXAnchor.constraint(equalTo: zone_kontni.centerXAnchor)
         ])
 
-        kontrèntLis.append(contentsOf: [
-            boutonNivoFasil.topAnchor.constraint(equalTo: etikètSou.bottomAnchor, constant: 60),
-            boutonNivoFasil.leadingAnchor.constraint(equalTo: rezipiyanKontni.leadingAnchor, constant: marjOrizontal),
-            boutonNivoFasil.trailingAnchor.constraint(equalTo: rezipiyanKontni.trailingAnchor, constant: -marjOrizontal),
-            boutonNivoFasil.heightAnchor.constraint(equalToConstant: 80)
+        kontr.append(contentsOf: [
+            btn_fasil.topAnchor.constraint(equalTo: lab_deskripsyon.bottomAnchor, constant: 60),
+            btn_fasil.leadingAnchor.constraint(equalTo: zone_kontni.leadingAnchor, constant: marge_x),
+            btn_fasil.trailingAnchor.constraint(equalTo: zone_kontni.trailingAnchor, constant: -marge_x),
+            btn_fasil.heightAnchor.constraint(equalToConstant: 80)
         ])
 
-        kontrèntLis.append(contentsOf: [
-            boutonNivoMwayen.topAnchor.constraint(equalTo: boutonNivoFasil.bottomAnchor, constant: espasVertikal),
-            boutonNivoMwayen.leadingAnchor.constraint(equalTo: rezipiyanKontni.leadingAnchor, constant: marjOrizontal),
-            boutonNivoMwayen.trailingAnchor.constraint(equalTo: rezipiyanKontni.trailingAnchor, constant: -marjOrizontal),
-            boutonNivoMwayen.heightAnchor.constraint(equalToConstant: 80)
+        kontr.append(contentsOf: [
+            btn_mwayen.topAnchor.constraint(equalTo: btn_fasil.bottomAnchor, constant: espas_y),
+            btn_mwayen.leadingAnchor.constraint(equalTo: zone_kontni.leadingAnchor, constant: marge_x),
+            btn_mwayen.trailingAnchor.constraint(equalTo: zone_kontni.trailingAnchor, constant: -marge_x),
+            btn_mwayen.heightAnchor.constraint(equalToConstant: 80)
         ])
 
-        kontrèntLis.append(contentsOf: [
-            boutonNivoDifisil.topAnchor.constraint(equalTo: boutonNivoMwayen.bottomAnchor, constant: espasVertikal),
-            boutonNivoDifisil.leadingAnchor.constraint(equalTo: rezipiyanKontni.leadingAnchor, constant: marjOrizontal),
-            boutonNivoDifisil.trailingAnchor.constraint(equalTo: rezipiyanKontni.trailingAnchor, constant: -marjOrizontal),
-            boutonNivoDifisil.heightAnchor.constraint(equalToConstant: 80)
+        kontr.append(contentsOf: [
+            btn_difisil.topAnchor.constraint(equalTo: btn_mwayen.bottomAnchor, constant: espas_y),
+            btn_difisil.leadingAnchor.constraint(equalTo: zone_kontni.leadingAnchor, constant: marge_x),
+            btn_difisil.trailingAnchor.constraint(equalTo: zone_kontni.trailingAnchor, constant: -marge_x),
+            btn_difisil.heightAnchor.constraint(equalToConstant: 80)
         ])
 
-        kontrèntLis.append(contentsOf: [
-            boutonVèKlasman.topAnchor.constraint(equalTo: boutonNivoDifisil.bottomAnchor, constant: 40),
-            boutonVèKlasman.leadingAnchor.constraint(equalTo: rezipiyanKontni.leadingAnchor, constant: marjOrizontal),
-            boutonVèKlasman.trailingAnchor.constraint(equalTo: rezipiyanKontni.trailingAnchor, constant: -marjOrizontal),
-            boutonVèKlasman.heightAnchor.constraint(equalToConstant: 60)
+        kontr.append(contentsOf: [
+            btn_klasman.topAnchor.constraint(equalTo: btn_difisil.bottomAnchor, constant: 40),
+            btn_klasman.leadingAnchor.constraint(equalTo: zone_kontni.leadingAnchor, constant: marge_x),
+            btn_klasman.trailingAnchor.constraint(equalTo: zone_kontni.trailingAnchor, constant: -marge_x),
+            btn_klasman.heightAnchor.constraint(equalToConstant: 60)
         ])
 
-        kontrèntLis.append(contentsOf: [
-            boutonVèReglaj.topAnchor.constraint(equalTo: boutonVèKlasman.bottomAnchor, constant: espasVertikal),
-            boutonVèReglaj.leadingAnchor.constraint(equalTo: rezipiyanKontni.leadingAnchor, constant: marjOrizontal),
-            boutonVèReglaj.trailingAnchor.constraint(equalTo: rezipiyanKontni.trailingAnchor, constant: -marjOrizontal),
-            boutonVèReglaj.heightAnchor.constraint(equalToConstant: 60),
-            boutonVèReglaj.bottomAnchor.constraint(equalTo: rezipiyanKontni.bottomAnchor, constant: -40)
+        kontr.append(contentsOf: [
+            btn_reglaj.topAnchor.constraint(equalTo: btn_klasman.bottomAnchor, constant: espas_y),
+            btn_reglaj.leadingAnchor.constraint(equalTo: zone_kontni.leadingAnchor, constant: marge_x),
+            btn_reglaj.trailingAnchor.constraint(equalTo: zone_kontni.trailingAnchor, constant: -marge_x),
+            btn_reglaj.heightAnchor.constraint(equalToConstant: 60),
+            btn_reglaj.bottomAnchor.constraint(equalTo: zone_kontni.bottomAnchor, constant: -40)
         ])
 
-        NSLayoutConstraint.activate(kontrèntLis)
+        NSLayoutConstraint.activate(kontr)
     }
 
-    private func lansAnimasyon() {
-        let elemTèks: [UIView] = [etikètTit, etikètSou]
+    private func lanse_animasyon() {
+        let teks_elem: [UIView] = [lab_tit, lab_deskripsyon]
 
-        for (idx, elem) in elemTèks.enumerated() {
+        for (idx, elem) in teks_elem.enumerated() {
             elem.alpha = 0
 
-            let dekalajeY: CGFloat = (idx == 0) ? -50 : -30
-            elem.transform = CGAffineTransform(translationX: 0, y: dekalajeY)
+            let dekala_y: CGFloat = (idx == 0) ? -50 : -30
+            elem.transform = CGAffineTransform(translationX: 0, y: dekala_y)
         }
 
-        let elemBouton: [UIView] = [
-            boutonNivoFasil,
-            boutonNivoMwayen,
-            boutonNivoDifisil,
-            boutonVèKlasman,
-            boutonVèReglaj
+        let btn_elem: [UIView] = [
+            btn_fasil,
+            btn_mwayen,
+            btn_difisil,
+            btn_klasman,
+            btn_reglaj
         ]
 
-        for bouton in elemBouton {
-            bouton.alpha = 0
-            bouton.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+        for btn in btn_elem {
+            btn.alpha = 0
+            btn.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
         }
 
         UIView.animate(
@@ -497,8 +482,8 @@ class AkèyViewController: UIViewController {
             initialSpringVelocity: 0.5,
             options: .curveEaseOut,
             animations: {
-                self.etikètTit.alpha = 1
-                self.etikètTit.transform = CGAffineTransform.identity
+                self.lab_tit.alpha = 1
+                self.lab_tit.transform = CGAffineTransform.identity
             },
             completion: nil
         )
@@ -508,39 +493,39 @@ class AkèyViewController: UIViewController {
             delay: 0.3,
             options: .curveEaseOut,
             animations: {
-                self.etikètSou.alpha = 1
-                self.etikètSou.transform = CGAffineTransform.identity
+                self.lab_deskripsyon.alpha = 1
+                self.lab_deskripsyon.transform = CGAffineTransform.identity
             },
             completion: nil
         )
 
-        for (idx, bouton) in elemBouton.enumerated() {
-            let delè = 0.5 + Double(idx) * 0.1
+        for (idx, btn) in btn_elem.enumerated() {
+            let ret = 0.5 + Double(idx) * 0.1
 
             UIView.animate(
                 withDuration: 0.5,
-                delay: delè,
+                delay: ret,
                 usingSpringWithDamping: 0.7,
                 initialSpringVelocity: 0.5,
                 options: .curveEaseOut,
                 animations: {
-                    bouton.alpha = 1
-                    bouton.transform = CGAffineTransform.identity
+                    btn.alpha = 1
+                    btn.transform = CGAffineTransform.identity
                 },
                 completion: nil
             )
         }
     }
 
-    @objc private func jereTouchAnba(_ bouton: UIButton) {
-        let transformEchèl = CGAffineTransform(scaleX: 0.95, y: 0.95)
+    @objc private func touch_anba(_ btn: UIButton) {
+        let trans = CGAffineTransform(scaleX: 0.95, y: 0.95)
 
         UIView.animate(withDuration: 0.1) {
-            bouton.transform = transformEchèl
+            btn.transform = trans
         }
     }
 
-    @objc private func jereTouchMonte(_ bouton: UIButton) {
+    @objc private func touch_monte(_ btn: UIButton) {
         UIView.animate(
             withDuration: 0.2,
             delay: 0,
@@ -548,36 +533,36 @@ class AkèyViewController: UIViewController {
             initialSpringVelocity: 0.5,
             options: .curveEaseOut,
             animations: {
-                bouton.transform = CGAffineTransform.identity
+                btn.transform = CGAffineTransform.identity
             },
             completion: nil
         )
     }
 
-    @objc private func jereKlikFasil() {
-        navigeVèJwe(.fasil)
+    @objc private func aksyon_fasil() {
+        ale_jwe(.fasil)
     }
 
-    @objc private func jereKlikMwayen() {
-        navigeVèJwe(.mwayen)
+    @objc private func aksyon_mwayen() {
+        ale_jwe(.mwayen)
     }
 
-    @objc private func jereKlikDifisil() {
-        navigeVèJwe(.difisil)
+    @objc private func aksyon_difisil() {
+        ale_jwe(.difisil)
     }
 
-    @objc private func jereKlikKlasman() {
+    @objc private func aksyon_klasman() {
         let kontrolè = KlasmanViewController()
         navigationController?.pushViewController(kontrolè, animated: true)
     }
 
-    @objc private func jereKlikReglaj() {
+    @objc private func aksyon_reglaj() {
         let kontrolè = ReglajViewController()
         navigationController?.pushViewController(kontrolè, animated: true)
     }
 
-    private func navigeVèJwe(_ nivo: NivoJwe) {
-        let kontrolèJwe = JweViewController(nivo: nivo)
-        navigationController?.pushViewController(kontrolèJwe, animated: true)
+    private func ale_jwe(_ nivo: NivoJwe) {
+        let kontrolè_jwe = JweViewController(nivo: nivo)
+        navigationController?.pushViewController(kontrolè_jwe, animated: true)
     }
 }

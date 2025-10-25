@@ -11,48 +11,47 @@ import MessageUI
 class ReglajViewController: UIViewController {
 
     // MARK: - Properties
-    private let defilerVi: UIScrollView = {
-        let defilerVi = UIScrollView()
-        defilerVi.translatesAutoresizingMaskIntoConstraints = false
-        defilerVi.showsVerticalScrollIndicator = false
-        return defilerVi
+    private let zone_scroll: UIScrollView = {
+        let scroll = UIScrollView()
+        scroll.translatesAutoresizingMaskIntoConstraints = false
+        scroll.showsVerticalScrollIndicator = false
+        return scroll
     }()
 
-    private let kontènèVi: UIView = {
+    private let zone_kontni: UIView = {
         let vi = UIView()
         vi.translatesAutoresizingMaskIntoConstraints = false
         return vi
     }()
 
     // How to Play Section
-    private let seksyonKòmanJwe: UIView = {
+    private let seksyon_kouma: UIView = {
         let vi = UIView()
         vi.backgroundColor = UIColor(white: 1.0, alpha: 0.95)
         vi.layer.cornerRadius = DesignRadius.large
         vi.layer.applyShadow(.large)
         vi.translatesAutoresizingMaskIntoConstraints = false
         
-        // Add subtle border
         vi.layer.borderWidth = 1.0
         vi.layer.borderColor = UIColor(white: 1.0, alpha: 0.3).cgColor
         
         return vi
     }()
 
-    private let tikètKòmanJwe: UILabel = {
-        let etikèt = UILabel()
-        etikèt.text = "📖 How to Play"
-        etikèt.font = DesignTypography.title2
-        etikèt.textColor = DesignColors.textPrimary
-        etikèt.translatesAutoresizingMaskIntoConstraints = false
-        return etikèt
+    private let lab_tit_kouma: UILabel = {
+        let lab = UILabel()
+        lab.text = "📖 How to Play"
+        lab.font = DesignTypography.title2
+        lab.textColor = DesignColors.textPrimary
+        lab.translatesAutoresizingMaskIntoConstraints = false
+        return lab
     }()
 
-    private let tèksEnstriksyon: UILabel = {
-        let etikèt = UILabel()
-        etikèt.numberOfLines = 0
-        etikèt.font = DesignTypography.body
-        etikèt.textColor = DesignColors.textSecondary
+    private let lab_enstriksyon: UILabel = {
+        let lab = UILabel()
+        lab.numberOfLines = 0
+        lab.font = DesignTypography.body
+        lab.textColor = DesignColors.textSecondary
 
         let tèks = """
         🎮 Game Rules:
@@ -86,225 +85,220 @@ class ReglajViewController: UIViewController {
         • Mssiu (特殊): Special purple tiles, 1-6
         """
 
-        etikèt.text = tèks
-        etikèt.translatesAutoresizingMaskIntoConstraints = false
-        return etikèt
+        lab.text = tèks
+        lab.translatesAutoresizingMaskIntoConstraints = false
+        return lab
     }()
 
-    // Feedback Section
-    private let boutonFidba: UIButton = {
-        let bouton = GradientButton()
-        bouton.translatesAutoresizingMaskIntoConstraints = false
-        return bouton
+    // Action buttons
+    private let btn_fidba: UIButton = {
+        let btn = GradientButton()
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        return btn
     }()
 
-    private let boutonEfase: UIButton = {
-        let bouton = GradientButton()
-        bouton.translatesAutoresizingMaskIntoConstraints = false
-        return bouton
+    private let btn_efase: UIButton = {
+        let btn = GradientButton()
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        return btn
     }()
 
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        konfigireUI()
+        prepare_ui()
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        // Update background gradient frame
         DynamicBackgroundFactory.updateBackgroundFrame(for: view)
         
-        // Add gradient to buttons after layout
-        if boutonFidba.layer.sublayers?.first(where: { $0 is CAGradientLayer }) == nil {
-            let gradientFidba = GradientFactory.primaryGradient()
-            gradientFidba.frame = boutonFidba.bounds
-            gradientFidba.cornerRadius = DesignRadius.medium
-            boutonFidba.layer.insertSublayer(gradientFidba, at: 0)
+        if btn_fidba.layer.sublayers?.first(where: { $0 is CAGradientLayer }) == nil {
+            let grad1 = GradientFactory.primaryGradient()
+            grad1.frame = btn_fidba.bounds
+            grad1.cornerRadius = DesignRadius.medium
+            btn_fidba.layer.insertSublayer(grad1, at: 0)
         }
         
-        if boutonEfase.layer.sublayers?.first(where: { $0 is CAGradientLayer }) == nil {
-            let gradientEfase = GradientFactory.accentGradient()
-            gradientEfase.frame = boutonEfase.bounds
-            gradientEfase.cornerRadius = DesignRadius.medium
-            boutonEfase.layer.insertSublayer(gradientEfase, at: 0)
+        if btn_efase.layer.sublayers?.first(where: { $0 is CAGradientLayer }) == nil {
+            let grad2 = GradientFactory.accentGradient()
+            grad2.frame = btn_efase.bounds
+            grad2.cornerRadius = DesignRadius.medium
+            btn_efase.layer.insertSublayer(grad2, at: 0)
         }
         
-        // Update gradient frames
-        if let gradientFidba = boutonFidba.layer.sublayers?.first(where: { $0 is CAGradientLayer }) as? CAGradientLayer {
-            gradientFidba.frame = boutonFidba.bounds
+        if let grad1 = btn_fidba.layer.sublayers?.first(where: { $0 is CAGradientLayer }) as? CAGradientLayer {
+            grad1.frame = btn_fidba.bounds
         }
         
-        if let gradientEfase = boutonEfase.layer.sublayers?.first(where: { $0 is CAGradientLayer }) as? CAGradientLayer {
-            gradientEfase.frame = boutonEfase.bounds
+        if let grad2 = btn_efase.layer.sublayers?.first(where: { $0 is CAGradientLayer }) as? CAGradientLayer {
+            grad2.frame = btn_efase.bounds
         }
     }
 
-    // MARK: - UI Configuration
-    private func konfigireUI() {
+    // MARK: - UI Setup
+    private func prepare_ui() {
         title = "Settings"
         
-        // Add dynamic animated background
         DynamicBackgroundFactory.createAnimatedBackground(for: view)
         
         navigationController?.setNavigationBarHidden(false, animated: true)
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationBar.tintColor = DesignColors.primaryGradientStart
         
-        // Make navigation bar transparent
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithTransparentBackground()
-        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
-        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
-        navigationController?.navigationBar.standardAppearance = appearance
-        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        let aparans = UINavigationBarAppearance()
+        aparans.configureWithTransparentBackground()
+        aparans.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+        aparans.titleTextAttributes = [.foregroundColor: UIColor.white]
+        navigationController?.navigationBar.standardAppearance = aparans
+        navigationController?.navigationBar.scrollEdgeAppearance = aparans
 
-        view.addSubview(defilerVi)
-        defilerVi.addSubview(kontènèVi)
+        view.addSubview(zone_scroll)
+        zone_scroll.addSubview(zone_kontni)
 
-        kontènèVi.addSubview(seksyonKòmanJwe)
-        seksyonKòmanJwe.addSubview(tikètKòmanJwe)
-        seksyonKòmanJwe.addSubview(tèksEnstriksyon)
+        zone_kontni.addSubview(seksyon_kouma)
+        seksyon_kouma.addSubview(lab_tit_kouma)
+        seksyon_kouma.addSubview(lab_enstriksyon)
 
-        kontènèVi.addSubview(boutonFidba)
-        kontènèVi.addSubview(boutonEfase)
+        zone_kontni.addSubview(btn_fidba)
+        zone_kontni.addSubview(btn_efase)
         
-        konfigireBouton(boutonFidba, ikòn: "✉️", tit: "Send Feedback", aksyon: #selector(boutonFidbaTape))
-        konfigireBouton(boutonEfase, ikòn: "🗑️", tit: "Clear All Data", aksyon: #selector(boutonEfaseTape))
+        monte_bouton(btn_fidba, emoji: "✉️", tit: "Send Feedback", aksyon: #selector(tap_fidba))
+        monte_bouton(btn_efase, emoji: "🗑️", tit: "Clear All Data", aksyon: #selector(tap_efase))
 
-        aplikiKontrènt()
+        monte_kontrènt()
     }
 
-    private func konfigireBouton(_ bouton: UIButton, ikòn: String, tit: String, aksyon: Selector) {
-        let pila = UIStackView()
-        pila.axis = .horizontal
-        pila.spacing = 12
-        pila.alignment = .center
-        pila.isUserInteractionEnabled = false
-        pila.translatesAutoresizingMaskIntoConstraints = false
+    private func monte_bouton(_ btn: UIButton, emoji: String, tit: String, aksyon: Selector) {
+        let stak = UIStackView()
+        stak.axis = .horizontal
+        stak.spacing = 12
+        stak.alignment = .center
+        stak.isUserInteractionEnabled = false
+        stak.translatesAutoresizingMaskIntoConstraints = false
 
-        let etikètIkòn = UILabel()
-        etikètIkòn.text = ikòn
-        etikètIkòn.font = UIFont.systemFont(ofSize: 24)
+        let lab_emoji = UILabel()
+        lab_emoji.text = emoji
+        lab_emoji.font = UIFont.systemFont(ofSize: 24)
 
-        let etikètTit = UILabel()
-        etikètTit.text = tit
-        etikètTit.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
-        etikètTit.textColor = .white
+        let lab_tit = UILabel()
+        lab_tit.text = tit
+        lab_tit.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
+        lab_tit.textColor = .white
 
-        pila.addArrangedSubview(etikètIkòn)
-        pila.addArrangedSubview(etikètTit)
+        stak.addArrangedSubview(lab_emoji)
+        stak.addArrangedSubview(lab_tit)
 
-        bouton.addSubview(pila)
+        btn.addSubview(stak)
 
         NSLayoutConstraint.activate([
-            pila.centerXAnchor.constraint(equalTo: bouton.centerXAnchor),
-            pila.centerYAnchor.constraint(equalTo: bouton.centerYAnchor)
+            stak.centerXAnchor.constraint(equalTo: btn.centerXAnchor),
+            stak.centerYAnchor.constraint(equalTo: btn.centerYAnchor)
         ])
 
-        bouton.addTarget(self, action: aksyon, for: .touchUpInside)
-        bouton.addTarget(self, action: #selector(boutonPreseAnba(_:)), for: .touchDown)
-        bouton.addTarget(self, action: #selector(boutonLage(_:)), for: [.touchUpInside, .touchUpOutside, .touchCancel])
+        btn.addTarget(self, action: aksyon, for: .touchUpInside)
+        btn.addTarget(self, action: #selector(prese_anba(_:)), for: .touchDown)
+        btn.addTarget(self, action: #selector(lage(_:)), for: [.touchUpInside, .touchUpOutside, .touchCancel])
     }
 
-    private func aplikiKontrènt() {
-        let gwayidSekire = view.safeAreaLayoutGuide
-        let marj: CGFloat = 20
+    private func monte_kontrènt() {
+        let safe = view.safeAreaLayoutGuide
+        let marge: CGFloat = 20
 
         NSLayoutConstraint.activate([
-            defilerVi.topAnchor.constraint(equalTo: gwayidSekire.topAnchor),
-            defilerVi.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            defilerVi.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            defilerVi.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            zone_scroll.topAnchor.constraint(equalTo: safe.topAnchor),
+            zone_scroll.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            zone_scroll.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            zone_scroll.bottomAnchor.constraint(equalTo: view.bottomAnchor),
 
-            kontènèVi.topAnchor.constraint(equalTo: defilerVi.topAnchor),
-            kontènèVi.leadingAnchor.constraint(equalTo: defilerVi.leadingAnchor),
-            kontènèVi.trailingAnchor.constraint(equalTo: defilerVi.trailingAnchor),
-            kontènèVi.bottomAnchor.constraint(equalTo: defilerVi.bottomAnchor),
-            kontènèVi.widthAnchor.constraint(equalTo: defilerVi.widthAnchor),
+            zone_kontni.topAnchor.constraint(equalTo: zone_scroll.topAnchor),
+            zone_kontni.leadingAnchor.constraint(equalTo: zone_scroll.leadingAnchor),
+            zone_kontni.trailingAnchor.constraint(equalTo: zone_scroll.trailingAnchor),
+            zone_kontni.bottomAnchor.constraint(equalTo: zone_scroll.bottomAnchor),
+            zone_kontni.widthAnchor.constraint(equalTo: zone_scroll.widthAnchor),
 
-            seksyonKòmanJwe.topAnchor.constraint(equalTo: kontènèVi.topAnchor, constant: marj),
-            seksyonKòmanJwe.leadingAnchor.constraint(equalTo: kontènèVi.leadingAnchor, constant: marj),
-            seksyonKòmanJwe.trailingAnchor.constraint(equalTo: kontènèVi.trailingAnchor, constant: -marj),
+            seksyon_kouma.topAnchor.constraint(equalTo: zone_kontni.topAnchor, constant: marge),
+            seksyon_kouma.leadingAnchor.constraint(equalTo: zone_kontni.leadingAnchor, constant: marge),
+            seksyon_kouma.trailingAnchor.constraint(equalTo: zone_kontni.trailingAnchor, constant: -marge),
 
-            tikètKòmanJwe.topAnchor.constraint(equalTo: seksyonKòmanJwe.topAnchor, constant: 20),
-            tikètKòmanJwe.leadingAnchor.constraint(equalTo: seksyonKòmanJwe.leadingAnchor, constant: 20),
-            tikètKòmanJwe.trailingAnchor.constraint(equalTo: seksyonKòmanJwe.trailingAnchor, constant: -20),
+            lab_tit_kouma.topAnchor.constraint(equalTo: seksyon_kouma.topAnchor, constant: 20),
+            lab_tit_kouma.leadingAnchor.constraint(equalTo: seksyon_kouma.leadingAnchor, constant: 20),
+            lab_tit_kouma.trailingAnchor.constraint(equalTo: seksyon_kouma.trailingAnchor, constant: -20),
 
-            tèksEnstriksyon.topAnchor.constraint(equalTo: tikètKòmanJwe.bottomAnchor, constant: 16),
-            tèksEnstriksyon.leadingAnchor.constraint(equalTo: seksyonKòmanJwe.leadingAnchor, constant: 20),
-            tèksEnstriksyon.trailingAnchor.constraint(equalTo: seksyonKòmanJwe.trailingAnchor, constant: -20),
-            tèksEnstriksyon.bottomAnchor.constraint(equalTo: seksyonKòmanJwe.bottomAnchor, constant: -20),
+            lab_enstriksyon.topAnchor.constraint(equalTo: lab_tit_kouma.bottomAnchor, constant: 16),
+            lab_enstriksyon.leadingAnchor.constraint(equalTo: seksyon_kouma.leadingAnchor, constant: 20),
+            lab_enstriksyon.trailingAnchor.constraint(equalTo: seksyon_kouma.trailingAnchor, constant: -20),
+            lab_enstriksyon.bottomAnchor.constraint(equalTo: seksyon_kouma.bottomAnchor, constant: -20),
 
-            boutonFidba.topAnchor.constraint(equalTo: seksyonKòmanJwe.bottomAnchor, constant: 24),
-            boutonFidba.leadingAnchor.constraint(equalTo: kontènèVi.leadingAnchor, constant: marj),
-            boutonFidba.trailingAnchor.constraint(equalTo: kontènèVi.trailingAnchor, constant: -marj),
-            boutonFidba.heightAnchor.constraint(equalToConstant: 56),
+            btn_fidba.topAnchor.constraint(equalTo: seksyon_kouma.bottomAnchor, constant: 24),
+            btn_fidba.leadingAnchor.constraint(equalTo: zone_kontni.leadingAnchor, constant: marge),
+            btn_fidba.trailingAnchor.constraint(equalTo: zone_kontni.trailingAnchor, constant: -marge),
+            btn_fidba.heightAnchor.constraint(equalToConstant: 56),
 
-            boutonEfase.topAnchor.constraint(equalTo: boutonFidba.bottomAnchor, constant: 16),
-            boutonEfase.leadingAnchor.constraint(equalTo: kontènèVi.leadingAnchor, constant: marj),
-            boutonEfase.trailingAnchor.constraint(equalTo: kontènèVi.trailingAnchor, constant: -marj),
-            boutonEfase.heightAnchor.constraint(equalToConstant: 56),
-            boutonEfase.bottomAnchor.constraint(equalTo: kontènèVi.bottomAnchor, constant: -40)
+            btn_efase.topAnchor.constraint(equalTo: btn_fidba.bottomAnchor, constant: 16),
+            btn_efase.leadingAnchor.constraint(equalTo: zone_kontni.leadingAnchor, constant: marge),
+            btn_efase.trailingAnchor.constraint(equalTo: zone_kontni.trailingAnchor, constant: -marge),
+            btn_efase.heightAnchor.constraint(equalToConstant: 56),
+            btn_efase.bottomAnchor.constraint(equalTo: zone_kontni.bottomAnchor, constant: -40)
         ])
     }
 
     // MARK: - Actions
-    @objc private func boutonFidbaTape() {
+    @objc private func tap_fidba() {
         if MFMailComposeViewController.canSendMail() {
-            let mailKonpoze = MFMailComposeViewController()
-            mailKonpoze.mailComposeDelegate = self
-            mailKonpoze.setToRecipients(["feedback@mahjong gridmind.com"])
-            mailKonpoze.setSubject("Mahjong Grid Mind Feedback")
-            mailKonpoze.setMessageBody("Hi there,\n\nI would like to share feedback about the game:\n\n", isHTML: false)
+            let mail = MFMailComposeViewController()
+            mail.mailComposeDelegate = self
+            mail.setToRecipients(["feedback@mahjong gridmind.com"])
+            mail.setSubject("Mahjong Grid Mind Feedback")
+            mail.setMessageBody("Hi there,\n\nI would like to share feedback about the game:\n\n", isHTML: false)
 
-            present(mailKonpoze, animated: true)
+            present(mail, animated: true)
         } else {
-            let alè = UIAlertController(
+            let alèt = UIAlertController(
                 title: "Email Not Available",
                 message: "Please configure your email account in Settings to send feedback.",
                 preferredStyle: .alert
             )
-            alè.addAction(UIAlertAction(title: "OK", style: .default))
-            present(alè, animated: true)
+            alèt.addAction(UIAlertAction(title: "OK", style: .default))
+            present(alèt, animated: true)
         }
     }
 
-    @objc private func boutonEfaseTape() {
+    @objc private func tap_efase() {
         BoitDyalògPèsonalize.aficheKonfimmasyon(
             nan: view,
             tikèt: "⚠️ Clear All Data",
             mesaj: "This will delete all your scores and progress. This action cannot be undone.",
             konfimeAksyon: { [weak self] in
-                self?.efaseToutDone()
+                self?.efase_tout()
             },
             anileAksyon: {}
         )
     }
 
-    private func efaseToutDone() {
+    private func efase_tout() {
         UserDefaults.standard.removeObject(forKey: "AnrejistrePwenKle")
         UserDefaults.standard.removeObject(forKey: "KontreSesyonSiyès")
 
-        let alè = UIAlertController(
+        let alèt = UIAlertController(
             title: "✅ Success",
             message: "All data has been cleared successfully.",
             preferredStyle: .alert
         )
-        alè.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alè, animated: true)
+        alèt.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alèt, animated: true)
     }
 
-    @objc private func boutonPreseAnba(_ bouton: UIButton) {
+    @objc private func prese_anba(_ btn: UIButton) {
         AnimationUtilities.springAnimation(duration: 0.15, animations: {
-            bouton.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
+            btn.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
         })
     }
 
-    @objc private func boutonLage(_ bouton: UIButton) {
+    @objc private func lage(_ btn: UIButton) {
         AnimationUtilities.springAnimation(duration: 0.3, damping: 0.6, animations: {
-            bouton.transform = .identity
+            btn.transform = .identity
         })
     }
 }

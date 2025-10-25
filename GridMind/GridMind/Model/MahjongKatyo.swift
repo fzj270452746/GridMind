@@ -7,20 +7,23 @@
 
 import UIKit
 
-// MARK: - Color Configuration Protocol
+// MARK: - Abstract Renderer Protocol
 
-protocol KoulèStrategy {
-    func koulèPouTip() -> UIColor
+protocol RendèKoulè {
+    var koulèPriyoritè: UIColor { get }
+    func kalkileKoulèDinamik(pou valè: Int) -> UIColor
 }
 
-protocol KonfigiraskonNivo {
-    var nonAfiche: String { get }
-    var dimansyonGriy: (kolòn: Int, ranje: Int) { get }
-    var kantiteTotalKatyo: Int { get }
-    var koulèPrènsipal: UIColor { get }
+// MARK: - Level Descriptor Protocol
+
+protocol DescrirèNivo {
+    func jwenn_non() -> String
+    func jwenn_dimansyon() -> (lajè: Int, otè: Int)
+    func jwenn_total() -> Int
+    func jwenn_tèm_koulè() -> UIColor
 }
 
-// MARK: - Tile Category Enum
+// MARK: - Tile Type with Computed Colors
 
 enum TipKatyo: String, CaseIterable {
     case hudy  // 筒
@@ -29,63 +32,83 @@ enum TipKatyo: String, CaseIterable {
     case mssiu // 特殊牌
 
     var koulè: UIColor {
-        switch self {
-        case .hudy:
-            return UIColor(hue: 0.55, saturation: 0.75, brightness: 0.80, alpha: 1.0)
-        case .koieb:
-            return UIColor(hue: 0.98, saturation: 0.63, brightness: 0.80, alpha: 1.0)
-        case .zounl:
-            return UIColor(hue: 0.33, saturation: 0.57, brightness: 0.70, alpha: 1.0)
-        case .mssiu:
-            return UIColor(hue: 0.75, saturation: 0.44, brightness: 0.90, alpha: 1.0)
-        }
+        return kreye_randè_koulè().koulèPriyoritè
     }
 
-    private static var stratejiFabrik: [TipKatyo: KoulèStrategy] = {
-        return [
-            .hudy: KoulèHudyImpl(),
-            .koieb: KoulèKoiebImpl(),
-            .zounl: KoulèZounlImpl(),
-            .mssiu: KoulèMssiuImpl()
+    func kreye_randè_koulè() -> RendèKoulè {
+        let mappaj: [TipKatyo: RendèKoulè] = [
+            .hudy: RandèHudy(),
+            .koieb: RandèKoieb(),
+            .zounl: RandèZounl(),
+            .mssiu: RandèMssiu()
         ]
-    }()
-
-    func jwennStrategi() -> KoulèStrategy {
-        return Self.stratejiFabrik[self]!
+        return mappaj[self] ?? RandèHudy()
+    }
+    
+    func jwennStrategi() -> RendèKoulè {
+        return kreye_randè_koulè()
     }
 }
 
-// MARK: - Color Strategy Concrete Types
+// MARK: - Color Renderers Implementation
 
-fileprivate struct KoulèHudyImpl: KoulèStrategy {
-    func koulèPouTip() -> UIColor {
-        let rgb = (r: 51.0/255.0, g: 127.0/255.0, b: 204.0/255.0)
-        return UIColor(red: rgb.r, green: rgb.g, blue: rgb.b, alpha: 1.0)
+fileprivate struct RandèHudy: RendèKoulè {
+    var koulèPriyoritè: UIColor {
+        return UIColor(hue: 0.56, saturation: 0.77, brightness: 0.82, alpha: 1.0)
+    }
+    
+    func kalkileKoulèDinamik(pou valè: Int) -> UIColor {
+        let faktè = CGFloat(valè) / 9.0
+        return UIColor(red: 51.0/255.0 + faktè * 0.1, 
+                      green: 127.0/255.0 + faktè * 0.05,
+                      blue: 204.0/255.0 - faktè * 0.1, 
+                      alpha: 1.0)
     }
 }
 
-fileprivate struct KoulèKoiebImpl: KoulèStrategy {
-    func koulèPouTip() -> UIColor {
-        let rgb = (r: 204.0/255.0, g: 76.0/255.0, b: 76.0/255.0)
-        return UIColor(red: rgb.r, green: rgb.g, blue: rgb.b, alpha: 1.0)
+fileprivate struct RandèKoieb: RendèKoulè {
+    var koulèPriyoritè: UIColor {
+        return UIColor(hue: 0.99, saturation: 0.65, brightness: 0.82, alpha: 1.0)
+    }
+    
+    func kalkileKoulèDinamik(pou valè: Int) -> UIColor {
+        let faktè = CGFloat(valè) / 9.0
+        return UIColor(red: 204.0/255.0 - faktè * 0.08,
+                      green: 76.0/255.0 + faktè * 0.12,
+                      blue: 76.0/255.0 + faktè * 0.05,
+                      alpha: 1.0)
     }
 }
 
-fileprivate struct KoulèZounlImpl: KoulèStrategy {
-    func koulèPouTip() -> UIColor {
-        let rgb = (r: 76.0/255.0, g: 178.0/255.0, b: 102.0/255.0)
-        return UIColor(red: rgb.r, green: rgb.g, blue: rgb.b, alpha: 1.0)
+fileprivate struct RandèZounl: RendèKoulè {
+    var koulèPriyoritè: UIColor {
+        return UIColor(hue: 0.34, saturation: 0.59, brightness: 0.72, alpha: 1.0)
+    }
+    
+    func kalkileKoulèDinamik(pou valè: Int) -> UIColor {
+        let faktè = CGFloat(valè) / 9.0
+        return UIColor(red: 76.0/255.0 + faktè * 0.06,
+                      green: 178.0/255.0 - faktè * 0.1,
+                      blue: 102.0/255.0 + faktè * 0.08,
+                      alpha: 1.0)
     }
 }
 
-fileprivate struct KoulèMssiuImpl: KoulèStrategy {
-    func koulèPouTip() -> UIColor {
-        let rgb = (r: 178.0/255.0, g: 127.0/255.0, b: 229.0/255.0)
-        return UIColor(red: rgb.r, green: rgb.g, blue: rgb.b, alpha: 1.0)
+fileprivate struct RandèMssiu: RendèKoulè {
+    var koulèPriyoritè: UIColor {
+        return UIColor(hue: 0.76, saturation: 0.46, brightness: 0.92, alpha: 1.0)
+    }
+    
+    func kalkileKoulèDinamik(pou valè: Int) -> UIColor {
+        let faktè = CGFloat(valè) / 6.0
+        return UIColor(red: 178.0/255.0 + faktè * 0.05,
+                      green: 127.0/255.0 - faktè * 0.08,
+                      blue: 229.0/255.0 - faktè * 0.06,
+                      alpha: 1.0)
     }
 }
 
-// MARK: - Difficulty Level Enum
+// MARK: - Game Difficulty Levels
 
 enum NivoJwe: String, CaseIterable {
     case fasil
@@ -93,79 +116,92 @@ enum NivoJwe: String, CaseIterable {
     case difisil
 
     var nonAfiche: String {
-        return jwennKonfigirasyon().nonAfiche
+        return fabrike_deskriptè().jwenn_non()
     }
 
     var kantiteKolòn: Int {
-        return jwennKonfigirasyon().dimansyonGriy.kolòn
+        return fabrike_deskriptè().jwenn_dimansyon().lajè
     }
 
     var kantiteRanje: Int {
-        return jwennKonfigirasyon().dimansyonGriy.ranje
+        return fabrike_deskriptè().jwenn_dimansyon().otè
     }
 
     var kantiteTotalKatyo: Int {
-        return jwennKonfigirasyon().kantiteTotalKatyo
+        return fabrike_deskriptè().jwenn_total()
     }
 
     var koulèPrènsipal: UIColor {
-        return jwennKonfigirasyon().koulèPrènsipal
+        return fabrike_deskriptè().jwenn_tèm_koulè()
     }
 
-    private func jwennKonfigirasyon() -> KonfigiraskonNivo {
-        switch self {
-        case .fasil:
-            return KonfiguraskonFasilImpl()
-        case .mwayen:
-            return KonfiguraskonMwayenImpl()
-        case .difisil:
-            return KonfiguraskonDifisilImpl()
-        }
+    private func fabrike_deskriptè() -> DescrirèNivo {
+        let registri: [NivoJwe: DescrirèNivo] = [
+            .fasil: DeskriptèFasil(),
+            .mwayen: DeskriptèMwayen(),
+            .difisil: DeskriptèDifisil()
+        ]
+        return registri[self] ?? DeskriptèFasil()
     }
 }
 
-// MARK: - Difficulty Configuration Implementations
+// MARK: - Level Descriptors
 
-fileprivate struct KonfiguraskonFasilImpl: KonfigiraskonNivo {
-    let nonAfiche = "Easy"
-    let dimansyonGriy = (kolòn: 2, ranje: 2)
-
-    var kantiteTotalKatyo: Int {
-        return dimansyonGriy.kolòn * dimansyonGriy.ranje
+fileprivate struct DeskriptèFasil: DescrirèNivo {
+    private let strukturGrid = (x: 2, y: 2)
+    
+    func jwenn_non() -> String { "Easy" }
+    
+    func jwenn_dimansyon() -> (lajè: Int, otè: Int) {
+        return (lajè: strukturGrid.x, otè: strukturGrid.y)
     }
-
-    var koulèPrènsipal: UIColor {
-        return UIColor(hue: 0.40, saturation: 0.50, brightness: 0.80, alpha: 1.0)
+    
+    func jwenn_total() -> Int {
+        return strukturGrid.x * strukturGrid.y
     }
-}
-
-fileprivate struct KonfiguraskonMwayenImpl: KonfigiraskonNivo {
-    let nonAfiche = "Medium"
-    let dimansyonGriy = (kolòn: 3, ranje: 2)
-
-    var kantiteTotalKatyo: Int {
-        return dimansyonGriy.kolòn * dimansyonGriy.ranje
-    }
-
-    var koulèPrènsipal: UIColor {
-        return UIColor(hue: 0.12, saturation: 0.67, brightness: 0.90, alpha: 1.0)
+    
+    func jwenn_tèm_koulè() -> UIColor {
+        return UIColor(hue: 0.41, saturation: 0.52, brightness: 0.82, alpha: 1.0)
     }
 }
 
-fileprivate struct KonfiguraskonDifisilImpl: KonfigiraskonNivo {
-    let nonAfiche = "Hard"
-    let dimansyonGriy = (kolòn: 3, ranje: 3)
-
-    var kantiteTotalKatyo: Int {
-        return dimansyonGriy.kolòn * dimansyonGriy.ranje
+fileprivate struct DeskriptèMwayen: DescrirèNivo {
+    private let strukturGrid = (x: 3, y: 2)
+    
+    func jwenn_non() -> String { "Medium" }
+    
+    func jwenn_dimansyon() -> (lajè: Int, otè: Int) {
+        return (lajè: strukturGrid.x, otè: strukturGrid.y)
     }
-
-    var koulèPrènsipal: UIColor {
-        return UIColor(hue: 0.0, saturation: 0.56, brightness: 0.90, alpha: 1.0)
+    
+    func jwenn_total() -> Int {
+        return strukturGrid.x * strukturGrid.y
+    }
+    
+    func jwenn_tèm_koulè() -> UIColor {
+        return UIColor(hue: 0.13, saturation: 0.69, brightness: 0.92, alpha: 1.0)
     }
 }
 
-// MARK: - Core Tile Data Model
+fileprivate struct DeskriptèDifisil: DescrirèNivo {
+    private let strukturGrid = (x: 3, y: 3)
+    
+    func jwenn_non() -> String { "Hard" }
+    
+    func jwenn_dimansyon() -> (lajè: Int, otè: Int) {
+        return (lajè: strukturGrid.x, otè: strukturGrid.y)
+    }
+    
+    func jwenn_total() -> Int {
+        return strukturGrid.x * strukturGrid.y
+    }
+    
+    func jwenn_tèm_koulè() -> UIColor {
+        return UIColor(hue: 0.01, saturation: 0.58, brightness: 0.92, alpha: 1.0)
+    }
+}
+
+// MARK: - Core Tile Entity
 
 struct MahjongKatyo: Equatable, Codable {
     let idantifikasyon: String
@@ -173,19 +209,24 @@ struct MahjongKatyo: Equatable, Codable {
     let valè: Int
 
     var nonImaj: String {
-        return "\(tip.rawValue)_\(valè)"
+        return konstryiNonRessource()
+    }
+    
+    private func konstryiNonRessource() -> String {
+        return [tip.rawValue, String(valè)].joined(separator: "_")
     }
 
     init(tip: TipKatyo, valè: Int) {
-        self.idantifikasyon = Self.jenereIdanik()
+        self.idantifikasyon = MahjongKatyo.jenereidUnik()
         self.tip = tip
         self.valè = valè
     }
 
-    private static func jenereIdanik() -> String {
-        let timestamp = Date().timeIntervalSince1970
-        let random = arc4random_uniform(99999)
-        return "\(Int(timestamp * 1000))_\(random)"
+    private static func jenereidUnik() -> String {
+        let tanKounyea = Date().timeIntervalSince1970
+        let aleyatwa = UInt32.random(in: 10000...99999)
+        let konpoze = String(format: "%.0f_%05u", tanKounyea * 1000, aleyatwa)
+        return konpoze
     }
 
     static func == (lhs: MahjongKatyo, rhs: MahjongKatyo) -> Bool {
@@ -193,34 +234,49 @@ struct MahjongKatyo: Equatable, Codable {
     }
 }
 
-// MARK: - Tile Positioning State
+// MARK: - Positioned Tile State Manager
 
 struct KatyoAvèkPozisyon {
-    let katyo: MahjongKatyo
-    let endèks: Int
-    var chwazi: Bool
-    var afiche: Bool
+    private(set) var katyo: MahjongKatyo
+    private(set) var endèks: Int
+    private var etaSeleksyon: Bool
+    private var etaVizibilite: Bool
+
+    var chwazi: Bool {
+        get { return etaSeleksyon }
+        set { etaSeleksyon = newValue }
+    }
+    
+    var afiche: Bool {
+        get { return etaVizibilite }
+        set { etaVizibilite = newValue }
+    }
 
     init(katyo: MahjongKatyo, endèks: Int) {
         self.katyo = katyo
         self.endèks = endèks
-        self.chwazi = false
-        self.afiche = false
+        self.etaSeleksyon = false
+        self.etaVizibilite = false
     }
 
     mutating func baskileChouazi() {
-        chwazi = !chwazi
+        etaSeleksyon.toggle()
     }
 
     mutating func baskilaAfiche() {
-        afiche = !afiche
+        etaVizibilite.toggle()
     }
 
     mutating func definiChwazi(_ nouvoEta: Bool) {
-        chwazi = nouvoEta
+        etaSeleksyon = nouvoEta
     }
 
     mutating func definiAfiche(_ nouvoEta: Bool) {
-        afiche = nouvoEta
+        etaVizibilite = nouvoEta
+    }
+    
+    mutating func reyinisyalize() {
+        etaSeleksyon = false
+        etaVizibilite = false
     }
 }

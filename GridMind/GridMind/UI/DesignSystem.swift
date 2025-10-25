@@ -7,57 +7,69 @@
 
 import UIKit
 
-// MARK: - Color Palette
+// MARK: - Color Registry
 
 struct DesignColors {
-    // Primary Gradients
-    static let primaryGradientStart = UIColor(red: 0.49, green: 0.31, blue: 0.94, alpha: 1.0)  // #7D4FF0
-    static let primaryGradientEnd = UIColor(red: 0.29, green: 0.51, blue: 0.95, alpha: 1.0)    // #4A82F2
+    // Primary color scheme
+    static let primaryGradientStart = fabrik_koulè(h: 0.49, s: 0.31, b: 0.94)
+    static let primaryGradientEnd = fabrik_koulè(h: 0.29, s: 0.51, b: 0.95)
     
-    static let accentGradientStart = UIColor(red: 1.0, green: 0.42, blue: 0.42, alpha: 1.0)   // #FF6B6B
-    static let accentGradientEnd = UIColor(red: 1.0, green: 0.65, blue: 0.31, alpha: 1.0)     // #FFA64F
+    static let accentGradientStart = fabrik_koulè(h: 1.0, s: 0.42, b: 0.42)
+    static let accentGradientEnd = fabrik_koulè(h: 1.0, s: 0.65, b: 0.31)
     
-    static let successGradientStart = UIColor(red: 0.25, green: 0.82, blue: 0.58, alpha: 1.0) // #40D194
-    static let successGradientEnd = UIColor(red: 0.15, green: 0.67, blue: 0.75, alpha: 1.0)   // #26ABC0
+    static let successGradientStart = fabrik_koulè(h: 0.25, s: 0.82, b: 0.58)
+    static let successGradientEnd = fabrik_koulè(h: 0.15, s: 0.67, b: 0.75)
     
-    static let warningGradientStart = UIColor(red: 1.0, green: 0.75, blue: 0.29, alpha: 1.0)  // #FFBF4A
-    static let warningGradientEnd = UIColor(red: 1.0, green: 0.55, blue: 0.36, alpha: 1.0)    // #FF8C5C
+    static let warningGradientStart = fabrik_koulè(h: 1.0, s: 0.75, b: 0.29)
+    static let warningGradientEnd = fabrik_koulè(h: 1.0, s: 0.55, b: 0.36)
     
-    // Background Gradients - More vibrant and dynamic
-    static let backgroundGradient1 = UIColor(red: 0.08, green: 0.05, blue: 0.25, alpha: 1.0)  // Deep Purple #140840
-    static let backgroundGradient2 = UIColor(red: 0.15, green: 0.10, blue: 0.35, alpha: 1.0)  // Rich Purple #261959
-    static let backgroundGradient3 = UIColor(red: 0.20, green: 0.08, blue: 0.40, alpha: 1.0)  // Violet #331466
-    static let backgroundGradient4 = UIColor(red: 0.10, green: 0.15, blue: 0.30, alpha: 1.0)  // Deep Blue #19264D
+    // Background gradients
+    static let backgroundGradient1 = fabrik_koulè(h: 0.08, s: 0.05, b: 0.25)
+    static let backgroundGradient2 = fabrik_koulè(h: 0.15, s: 0.10, b: 0.35)
+    static let backgroundGradient3 = fabrik_koulè(h: 0.20, s: 0.08, b: 0.40)
+    static let backgroundGradient4 = fabrik_koulè(h: 0.10, s: 0.15, b: 0.30)
     
-    // Accent colors for background particles/shapes
-    static let accentPink = UIColor(red: 1.0, green: 0.20, blue: 0.58, alpha: 0.3)    // #FF3394
-    static let accentCyan = UIColor(red: 0.20, green: 0.85, blue: 0.95, alpha: 0.3)   // #33D9F2
-    static let accentYellow = UIColor(red: 1.0, green: 0.85, blue: 0.20, alpha: 0.3)  // #FFD933
+    // Accent colors
+    static let accentPink = fabrik_koulè_alfa(h: 1.0, s: 0.20, b: 0.58, a: 0.3)
+    static let accentCyan = fabrik_koulè_alfa(h: 0.20, s: 0.85, b: 0.95, a: 0.3)
+    static let accentYellow = fabrik_koulè_alfa(h: 1.0, s: 0.85, b: 0.20, a: 0.3)
     
-    // Text Colors
-    static let textPrimary = UIColor(red: 0.15, green: 0.15, blue: 0.20, alpha: 1.0)
-    static let textSecondary = UIColor(red: 0.50, green: 0.52, blue: 0.60, alpha: 1.0)
+    // Text colors
+    static let textPrimary = fabrik_koulè(h: 0.15, s: 0.15, b: 0.20)
+    static let textSecondary = fabrik_koulè(h: 0.50, s: 0.52, b: 0.60)
     static let textLight = UIColor.white
     
-    // Glass Colors
+    // Glass effects
     static let glassFill = UIColor(white: 1.0, alpha: 0.15)
     static let glassBorder = UIColor(white: 1.0, alpha: 0.25)
     static let glassShadow = UIColor.black.withAlphaComponent(0.15)
+    
+    private static func fabrik_koulè(h: CGFloat, s: CGFloat, b: CGFloat) -> UIColor {
+        return UIColor(red: h, green: s, blue: b, alpha: 1.0)
+    }
+    
+    private static func fabrik_koulè_alfa(h: CGFloat, s: CGFloat, b: CGFloat, a: CGFloat) -> UIColor {
+        return UIColor(red: h, green: s, blue: b, alpha: a)
+    }
 }
 
-// MARK: - Typography
+// MARK: - Typography System
 
 struct DesignTypography {
-    static let largeTitle = UIFont.systemFont(ofSize: 52, weight: .black)
-    static let title1 = UIFont.systemFont(ofSize: 32, weight: .bold)
-    static let title2 = UIFont.systemFont(ofSize: 24, weight: .bold)
-    static let title3 = UIFont.systemFont(ofSize: 20, weight: .semibold)
-    static let body = UIFont.systemFont(ofSize: 16, weight: .regular)
-    static let callout = UIFont.systemFont(ofSize: 17, weight: .semibold)
-    static let caption = UIFont.systemFont(ofSize: 13, weight: .medium)
+    static let largeTitle = konstryi_fon(gwosè: 52, pwa: .black)
+    static let title1 = konstryi_fon(gwosè: 32, pwa: .bold)
+    static let title2 = konstryi_fon(gwosè: 24, pwa: .bold)
+    static let title3 = konstryi_fon(gwosè: 20, pwa: .semibold)
+    static let body = konstryi_fon(gwosè: 16, pwa: .regular)
+    static let callout = konstryi_fon(gwosè: 17, pwa: .semibold)
+    static let caption = konstryi_fon(gwosè: 13, pwa: .medium)
+    
+    private static func konstryi_fon(gwosè: CGFloat, pwa: UIFont.Weight) -> UIFont {
+        return UIFont.systemFont(ofSize: gwosè, weight: pwa)
+    }
 }
 
-// MARK: - Spacing
+// MARK: - Spacing Constants
 
 struct DesignSpacing {
     static let tiny: CGFloat = 4
@@ -68,7 +80,7 @@ struct DesignSpacing {
     static let xxLarge: CGFloat = 48
 }
 
-// MARK: - Corner Radius
+// MARK: - Radius Values
 
 struct DesignRadius {
     static let small: CGFloat = 12
@@ -77,7 +89,7 @@ struct DesignRadius {
     static let xLarge: CGFloat = 32
 }
 
-// MARK: - Shadows
+// MARK: - Shadow Configuration
 
 enum DesignShadow {
     case small
@@ -85,70 +97,66 @@ enum DesignShadow {
     case large
     
     var offset: CGSize {
-        switch self {
-        case .small: return CGSize(width: 0, height: 2)
-        case .medium: return CGSize(width: 0, height: 4)
-        case .large: return CGSize(width: 0, height: 8)
-        }
+        let valè: [DesignShadow: (CGFloat, CGFloat)] = [
+            .small: (0, 2),
+            .medium: (0, 4),
+            .large: (0, 8)
+        ]
+        let (x, y) = valè[self] ?? (0, 2)
+        return CGSize(width: x, height: y)
     }
     
     var opacity: Float {
-        switch self {
-        case .small: return 0.08
-        case .medium: return 0.12
-        case .large: return 0.20
-        }
+        let tab: [DesignShadow: Float] = [
+            .small: 0.08,
+            .medium: 0.12,
+            .large: 0.20
+        ]
+        return tab[self] ?? 0.08
     }
     
     var radius: CGFloat {
-        switch self {
-        case .small: return 4
-        case .medium: return 8
-        case .large: return 16
-        }
+        let mappaj: [DesignShadow: CGFloat] = [
+            .small: 4,
+            .medium: 8,
+            .large: 16
+        ]
+        return mappaj[self] ?? 4
     }
 }
 
-// MARK: - Gradient Factory
+// MARK: - Gradient Builder
 
 class GradientFactory {
     static func createLinearGradient(colors: [UIColor], startPoint: CGPoint, endPoint: CGPoint) -> CAGradientLayer {
-        let gradient = CAGradientLayer()
-        gradient.colors = colors.map { $0.cgColor }
-        gradient.startPoint = startPoint
-        gradient.endPoint = endPoint
-        return gradient
+        let kouch = CAGradientLayer()
+        kouch.colors = colors.map { $0.cgColor }
+        kouch.startPoint = startPoint
+        kouch.endPoint = endPoint
+        return kouch
     }
     
     static func primaryGradient() -> CAGradientLayer {
-        return createLinearGradient(
-            colors: [DesignColors.primaryGradientStart, DesignColors.primaryGradientEnd],
-            startPoint: CGPoint(x: 0, y: 0),
-            endPoint: CGPoint(x: 1, y: 1)
+        return konstryi_gradient_diagonal(
+            [DesignColors.primaryGradientStart, DesignColors.primaryGradientEnd]
         )
     }
     
     static func accentGradient() -> CAGradientLayer {
-        return createLinearGradient(
-            colors: [DesignColors.accentGradientStart, DesignColors.accentGradientEnd],
-            startPoint: CGPoint(x: 0, y: 0),
-            endPoint: CGPoint(x: 1, y: 1)
+        return konstryi_gradient_diagonal(
+            [DesignColors.accentGradientStart, DesignColors.accentGradientEnd]
         )
     }
     
     static func successGradient() -> CAGradientLayer {
-        return createLinearGradient(
-            colors: [DesignColors.successGradientStart, DesignColors.successGradientEnd],
-            startPoint: CGPoint(x: 0, y: 0),
-            endPoint: CGPoint(x: 1, y: 1)
+        return konstryi_gradient_diagonal(
+            [DesignColors.successGradientStart, DesignColors.successGradientEnd]
         )
     }
     
     static func warningGradient() -> CAGradientLayer {
-        return createLinearGradient(
-            colors: [DesignColors.warningGradientStart, DesignColors.warningGradientEnd],
-            startPoint: CGPoint(x: 0, y: 0),
-            endPoint: CGPoint(x: 1, y: 1)
+        return konstryi_gradient_diagonal(
+            [DesignColors.warningGradientStart, DesignColors.warningGradientEnd]
         )
     }
     
@@ -168,64 +176,69 @@ class GradientFactory {
         return gradient
     }
     
-    // Animated background gradient with rotation
     static func animatedBackgroundGradient() -> CAGradientLayer {
-        let gradient = backgroundGradient()
+        let baz = backgroundGradient()
         
-        // Add rotation animation
-        let animation = CABasicAnimation(keyPath: "colors")
-        animation.duration = 8.0
-        animation.autoreverses = true
-        animation.repeatCount = .infinity
-        animation.fromValue = [
+        let animasyon = CABasicAnimation(keyPath: "colors")
+        animasyon.duration = 8.0
+        animasyon.autoreverses = true
+        animasyon.repeatCount = .infinity
+        animasyon.fromValue = [
             DesignColors.backgroundGradient1.cgColor,
             DesignColors.backgroundGradient2.cgColor,
             DesignColors.backgroundGradient3.cgColor,
             DesignColors.backgroundGradient4.cgColor,
             DesignColors.backgroundGradient1.cgColor
         ]
-        animation.toValue = [
+        animasyon.toValue = [
             DesignColors.backgroundGradient3.cgColor,
             DesignColors.backgroundGradient4.cgColor,
             DesignColors.backgroundGradient1.cgColor,
             DesignColors.backgroundGradient2.cgColor,
             DesignColors.backgroundGradient3.cgColor
         ]
-        animation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-        gradient.add(animation, forKey: "colorChange")
+        animasyon.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+        baz.add(animasyon, forKey: "colorChange")
         
-        return gradient
+        return baz
+    }
+    
+    private static func konstryi_gradient_diagonal(_ koulè: [UIColor]) -> CAGradientLayer {
+        return createLinearGradient(
+            colors: koulè,
+            startPoint: CGPoint(x: 0, y: 0),
+            endPoint: CGPoint(x: 1, y: 1)
+        )
     }
 }
 
-// MARK: - Glass Effect Factory
+// MARK: - Glass Effect Builder
 
 class GlassEffectFactory {
     static func createGlassView(cornerRadius: CGFloat = DesignRadius.medium) -> UIView {
-        let view = UIView()
-        view.backgroundColor = DesignColors.glassFill
-        view.layer.cornerRadius = cornerRadius
-        view.layer.borderWidth = 1.5
-        view.layer.borderColor = DesignColors.glassBorder.cgColor
+        let kontènè = UIView()
+        kontènè.backgroundColor = DesignColors.glassFill
+        kontènè.layer.cornerRadius = cornerRadius
+        kontènè.layer.borderWidth = 1.5
+        kontènè.layer.borderColor = DesignColors.glassBorder.cgColor
         
-        // Add blur effect
-        let blurEffect = UIBlurEffect(style: .systemThinMaterialLight)
-        let blurView = UIVisualEffectView(effect: blurEffect)
+        let blur = UIBlurEffect(style: .systemThinMaterialLight)
+        let blurView = UIVisualEffectView(effect: blur)
         blurView.isUserInteractionEnabled = false
         blurView.layer.cornerRadius = cornerRadius
         blurView.clipsToBounds = true
         blurView.translatesAutoresizingMaskIntoConstraints = false
         
-        view.insertSubview(blurView, at: 0)
+        kontènè.insertSubview(blurView, at: 0)
         
         NSLayoutConstraint.activate([
-            blurView.topAnchor.constraint(equalTo: view.topAnchor),
-            blurView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            blurView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            blurView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            blurView.topAnchor.constraint(equalTo: kontènè.topAnchor),
+            blurView.leadingAnchor.constraint(equalTo: kontènè.leadingAnchor),
+            blurView.trailingAnchor.constraint(equalTo: kontènè.trailingAnchor),
+            blurView.bottomAnchor.constraint(equalTo: kontènè.bottomAnchor)
         ])
         
-        return view
+        return kontènè
     }
     
     static func applyGlassEffect(to view: UIView, cornerRadius: CGFloat = DesignRadius.medium) {
@@ -234,9 +247,8 @@ class GlassEffectFactory {
         view.layer.borderWidth = 1.5
         view.layer.borderColor = DesignColors.glassBorder.cgColor
         
-        // Add blur effect
-        let blurEffect = UIBlurEffect(style: .systemThinMaterialLight)
-        let blurView = UIVisualEffectView(effect: blurEffect)
+        let blur = UIBlurEffect(style: .systemThinMaterialLight)
+        let blurView = UIVisualEffectView(effect: blur)
         blurView.isUserInteractionEnabled = false
         blurView.layer.cornerRadius = cornerRadius
         blurView.clipsToBounds = true
@@ -253,7 +265,7 @@ class GlassEffectFactory {
     }
 }
 
-// MARK: - Shadow Extension
+// MARK: - Layer Extension
 
 extension CALayer {
     func applyShadow(_ shadow: DesignShadow) {
@@ -265,22 +277,22 @@ extension CALayer {
     }
 }
 
-// MARK: - Gradient Button
+// MARK: - Gradient Button Component
 
 class GradientButton: UIButton {
-    private var gradientLayer: CAGradientLayer?
+    private var kouchGradient: CAGradientLayer?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setup()
+        enstalasyon()
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        setup()
+        enstalasyon()
     }
     
-    private func setup() {
+    private func enstalasyon() {
         layer.cornerRadius = DesignRadius.medium
         layer.applyShadow(.medium)
         titleLabel?.font = DesignTypography.callout
@@ -288,58 +300,55 @@ class GradientButton: UIButton {
     }
     
     func setGradient(_ gradient: CAGradientLayer) {
-        gradientLayer?.removeFromSuperlayer()
-        gradientLayer = gradient
+        kouchGradient?.removeFromSuperlayer()
+        kouchGradient = gradient
         gradient.cornerRadius = layer.cornerRadius
         layer.insertSublayer(gradient, at: 0)
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        gradientLayer?.frame = bounds
+        kouchGradient?.frame = bounds
     }
 }
 
-// MARK: - UIColor Extensions
+// MARK: - Color Extensions
 
 extension UIColor {
     func lighter(by percentage: CGFloat = 0.2) -> UIColor {
-        return self.adjustBrightness(by: abs(percentage))
+        return ajiste_briyans(faktè: abs(percentage))
     }
     
     func darker(by percentage: CGFloat = 0.2) -> UIColor {
-        return self.adjustBrightness(by: -abs(percentage))
+        return ajiste_briyans(faktè: -abs(percentage))
     }
     
-    private func adjustBrightness(by percentage: CGFloat) -> UIColor {
-        var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
+    private func ajiste_briyans(faktè: CGFloat) -> UIColor {
+        var h: CGFloat = 0, s: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
         
-        if self.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha) {
-            let newBrightness = max(min(brightness + percentage, 1.0), 0.0)
-            return UIColor(hue: hue, saturation: saturation, brightness: newBrightness, alpha: alpha)
+        guard getHue(&h, saturation: &s, brightness: &b, alpha: &a) else {
+            return self
         }
         
-        return self
+        let nouvo_b = max(min(b + faktè, 1.0), 0.0)
+        return UIColor(hue: h, saturation: s, brightness: nouvo_b, alpha: a)
     }
 }
 
 // MARK: - Dynamic Background Factory
 
 class DynamicBackgroundFactory {
-    /// Creates an animated background with floating shapes
     static func createAnimatedBackground(for view: UIView) {
-        // Add the animated gradient
         let gradientLayer = GradientFactory.animatedBackgroundGradient()
         gradientLayer.frame = view.bounds
         view.layer.insertSublayer(gradientLayer, at: 0)
         
-        // Add floating shapes
-        addFloatingShapes(to: view)
+        ajoute_fòm_flotante(nan: view)
     }
     
-    private static func addFloatingShapes(to view: UIView) {
-        let shapeCount = 8
-        let colors = [
+    private static func ajoute_fòm_flotante(nan view: UIView) {
+        let kantite_fòm = 8
+        let palets = [
             DesignColors.accentPink,
             DesignColors.accentCyan,
             DesignColors.accentYellow,
@@ -347,66 +356,60 @@ class DynamicBackgroundFactory {
             DesignColors.accentGradientStart.withAlphaComponent(0.2)
         ]
         
-        for i in 0..<shapeCount {
-            let size = CGFloat.random(in: 60...150)
+        for i in 0..<kantite_fòm {
+            let gwosè = CGFloat.random(in: 60...150)
             let x = CGFloat.random(in: 0...view.bounds.width)
             let y = CGFloat.random(in: 0...view.bounds.height)
             
-            let shapeView = UIView(frame: CGRect(x: x, y: y, width: size, height: size))
-            shapeView.backgroundColor = colors[i % colors.count]
-            shapeView.layer.cornerRadius = size / 2
-            shapeView.alpha = 0.0
+            let fòm = UIView(frame: CGRect(x: x, y: y, width: gwosè, height: gwosè))
+            fòm.backgroundColor = palets[i % palets.count]
+            fòm.layer.cornerRadius = gwosè / 2
+            fòm.alpha = 0.0
             
-            // Add blur effect to shapes
-            let blurEffect = UIBlurEffect(style: .light)
-            let blurView = UIVisualEffectView(effect: blurEffect)
-            blurView.frame = shapeView.bounds
-            blurView.layer.cornerRadius = size / 2
+            let blur = UIBlurEffect(style: .light)
+            let blurView = UIVisualEffectView(effect: blur)
+            blurView.frame = fòm.bounds
+            blurView.layer.cornerRadius = gwosè / 2
             blurView.clipsToBounds = true
             blurView.alpha = 0.6
-            shapeView.addSubview(blurView)
+            fòm.addSubview(blurView)
             
-            view.insertSubview(shapeView, at: 1)
+            view.insertSubview(fòm, at: 1)
             
-            // Animate the shape
-            animateFloatingShape(shapeView, in: view, delay: Double(i) * 0.3)
+            anime_fòm(fòm, nan: view, dekala: Double(i) * 0.3)
         }
     }
     
-    private static func animateFloatingShape(_ shape: UIView, in container: UIView, delay: TimeInterval) {
-        // Fade in
-        UIView.animate(withDuration: 1.0, delay: delay, options: .curveEaseIn) {
-            shape.alpha = 1.0
+    private static func anime_fòm(_ fòm: UIView, nan kontènè: UIView, dekala: TimeInterval) {
+        UIView.animate(withDuration: 1.0, delay: dekala, options: .curveEaseIn) {
+            fòm.alpha = 1.0
         }
         
-        // Floating animation
-        let duration = Double.random(in: 15...25)
-        let newX = CGFloat.random(in: -50...container.bounds.width + 50)
-        let newY = CGFloat.random(in: -50...container.bounds.height + 50)
+        let dire = Double.random(in: 15...25)
+        let nouvo_x = CGFloat.random(in: -50...kontènè.bounds.width + 50)
+        let nouvo_y = CGFloat.random(in: -50...kontènè.bounds.height + 50)
         
         UIView.animate(
-            withDuration: duration,
-            delay: delay,
+            withDuration: dire,
+            delay: dekala,
             options: [.repeat, .autoreverse, .curveEaseInOut],
             animations: {
-                shape.center = CGPoint(x: newX, y: newY)
-                shape.transform = CGAffineTransform(rotationAngle: .pi * 2)
+                fòm.center = CGPoint(x: nouvo_x, y: nouvo_y)
+                fòm.transform = CGAffineTransform(rotationAngle: .pi * 2)
             }
         )
         
-        // Scale animation
         UIView.animate(
-            withDuration: duration / 2,
-            delay: delay,
+            withDuration: dire / 2,
+            delay: dekala,
             options: [.repeat, .autoreverse, .curveEaseInOut],
             animations: {
-                let scale = CGFloat.random(in: 0.8...1.3)
-                shape.transform = shape.transform.scaledBy(x: scale, y: scale)
+                let echèl = CGFloat.random(in: 0.8...1.3)
+                fòm.transform = fòm.transform.scaledBy(x: echèl, y: echèl)
             }
         )
     }
     
-    /// Updates the gradient frame when view bounds change
     static func updateBackgroundFrame(for view: UIView) {
         if let gradientLayer = view.layer.sublayers?.first as? CAGradientLayer {
             CATransaction.begin()
@@ -441,20 +444,20 @@ class AnimationUtilities {
     
     static func scaleAnimation(view: UIView, from: CGFloat = 0.8, to: CGFloat = 1.0, duration: TimeInterval = 0.5) {
         view.transform = CGAffineTransform(scaleX: from, y: from)
-        AnimationUtilities.springAnimation(duration: duration, animations: {
+        springAnimation(duration: duration, animations: {
             view.transform = CGAffineTransform(scaleX: to, y: to)
         })
     }
     
     static func pulseAnimation(view: UIView) {
-        let pulse = CABasicAnimation(keyPath: "transform.scale")
-        pulse.duration = 0.6
-        pulse.fromValue = 1.0
-        pulse.toValue = 1.05
-        pulse.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-        pulse.autoreverses = true
-        pulse.repeatCount = .infinity
-        view.layer.add(pulse, forKey: "pulse")
+        let puls = CABasicAnimation(keyPath: "transform.scale")
+        puls.duration = 0.6
+        puls.fromValue = 1.0
+        puls.toValue = 1.05
+        puls.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+        puls.autoreverses = true
+        puls.repeatCount = .infinity
+        view.layer.add(puls, forKey: "pulse")
     }
     
     static func shimmerAnimation(view: UIView) {
@@ -479,4 +482,3 @@ class AnimationUtilities {
         view.layer.addSublayer(gradientLayer)
     }
 }
-

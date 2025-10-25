@@ -9,61 +9,60 @@ import UIKit
 
 class KatyoCellView: UIView {
 
-    // MARK: - Subviews
-
-    private lazy var kontenèImaj: UIImageView = {
-        let vueImaj = UIImageView()
-        vueImaj.contentMode = .scaleAspectFit
-        vueImaj.translatesAutoresizingMaskIntoConstraints = false
-        vueImaj.clipsToBounds = true
-        return vueImaj
+    // MARK: - Internal Components
+    
+    private lazy var zòn_imaj: UIImageView = {
+        let imaj = UIImageView()
+        imaj.contentMode = .scaleAspectFit
+        imaj.translatesAutoresizingMaskIntoConstraints = false
+        imaj.clipsToBounds = true
+        return imaj
     }()
 
-    private lazy var badNimewo: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 18, weight: .black)
-        label.textColor = UIColor.white
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.clipsToBounds = true
-        label.isHidden = true
+    private lazy var endikèt_nimewo: UILabel = {
+        let etikèt = UILabel()
+        etikèt.font = .systemFont(ofSize: 18, weight: .black)
+        etikèt.textColor = UIColor.white
+        etikèt.textAlignment = .center
+        etikèt.translatesAutoresizingMaskIntoConstraints = false
+        etikèt.clipsToBounds = true
+        etikèt.isHidden = true
         
-        // Modern gradient background
-        label.backgroundColor = DesignColors.successGradientStart
-        label.layer.cornerRadius = 14
-        label.layer.applyShadow(.small)
+        etikèt.backgroundColor = DesignColors.successGradientStart
+        etikèt.layer.cornerRadius = 14
+        etikèt.layer.applyShadow(.small)
 
-        return label
+        return etikèt
     }()
 
-    private lazy var kouchVizyèl: UIView = {
-        let masque = UIView()
-        masque.translatesAutoresizingMaskIntoConstraints = false
-        masque.layer.cornerRadius = 12
-        masque.clipsToBounds = true
-        masque.isHidden = true
+    private lazy var kouch_seleksyon: UIView = {
+        let overlay = UIView()
+        overlay.translatesAutoresizingMaskIntoConstraints = false
+        overlay.layer.cornerRadius = 12
+        overlay.clipsToBounds = true
+        overlay.isHidden = true
 
-        let koulèMasque = UIColor.white.withAlphaComponent(0.3)
-        masque.backgroundColor = koulèMasque
+        let koulè_overlay = UIColor.white.withAlphaComponent(0.3)
+        overlay.backgroundColor = koulè_overlay
 
-        return masque
+        return overlay
     }()
 
-    // MARK: - State Properties
+    // MARK: - State
 
     var katyo: MahjongKatyo?
 
     var estSeleksyone: Bool = false {
         didSet {
-            aplikeChanjmanSeleksyon()
+            aplike_chanjman_vizuèl()
         }
     }
 
-    // MARK: - Lifecycle
+    // MARK: - Initialization
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        enstalasyon()
+        konfigirasyon_inisyal()
     }
 
     required init?(coder: NSCoder) {
@@ -72,97 +71,93 @@ class KatyoCellView: UIView {
 
     // MARK: - Setup
 
-    private func enstalasyon() {
-        definiAparans()
-        ajouteSouVi()
-        definiKontrènt()
+    private func konfigirasyon_inisyal() {
+        prepare_aparans()
+        monte_kompozan()
+        prepare_kontrènt()
     }
 
-    private func definiAparans() {
-        // Modern glass card effect
+    private func prepare_aparans() {
         backgroundColor = UIColor(white: 1.0, alpha: 0.98)
         layer.cornerRadius = DesignRadius.medium
         layer.applyShadow(.medium)
         
-        // Add subtle border
         layer.borderWidth = 1.0
         layer.borderColor = UIColor(white: 1.0, alpha: 0.3).cgColor
         
-        // Enable 3D transforms
         layer.masksToBounds = false
         layer.shouldRasterize = false
     }
 
-    private func ajouteSouVi() {
-        addSubview(kontenèImaj)
-        addSubview(kouchVizyèl)
-        addSubview(badNimewo)
+    private func monte_kompozan() {
+        addSubview(zòn_imaj)
+        addSubview(kouch_seleksyon)
+        addSubview(endikèt_nimewo)
     }
 
-    private func definiKontrènt() {
-        let espas: CGFloat = 8
-        let petitEspas: CGFloat = 4
-        let tay: CGFloat = 32
+    private func prepare_kontrènt() {
+        let marge_jeneral: CGFloat = 8
+        let marge_piti: CGFloat = 4
+        let tay_bad: CGFloat = 32
 
         NSLayoutConstraint.activate([
-            kontenèImaj.topAnchor.constraint(equalTo: topAnchor, constant: espas),
-            kontenèImaj.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -espas),
-            kontenèImaj.leadingAnchor.constraint(equalTo: leadingAnchor, constant: espas),
-            kontenèImaj.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -espas)
+            zòn_imaj.topAnchor.constraint(equalTo: topAnchor, constant: marge_jeneral),
+            zòn_imaj.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -marge_jeneral),
+            zòn_imaj.leadingAnchor.constraint(equalTo: leadingAnchor, constant: marge_jeneral),
+            zòn_imaj.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -marge_jeneral)
         ])
 
         NSLayoutConstraint.activate([
-            kouchVizyèl.topAnchor.constraint(equalTo: topAnchor),
-            kouchVizyèl.bottomAnchor.constraint(equalTo: bottomAnchor),
-            kouchVizyèl.leadingAnchor.constraint(equalTo: leadingAnchor),
-            kouchVizyèl.trailingAnchor.constraint(equalTo: trailingAnchor)
+            kouch_seleksyon.topAnchor.constraint(equalTo: topAnchor),
+            kouch_seleksyon.bottomAnchor.constraint(equalTo: bottomAnchor),
+            kouch_seleksyon.leadingAnchor.constraint(equalTo: leadingAnchor),
+            kouch_seleksyon.trailingAnchor.constraint(equalTo: trailingAnchor)
         ])
 
         NSLayoutConstraint.activate([
-            badNimewo.topAnchor.constraint(equalTo: topAnchor, constant: petitEspas),
-            badNimewo.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -petitEspas),
-            badNimewo.widthAnchor.constraint(equalToConstant: tay),
-            badNimewo.heightAnchor.constraint(equalToConstant: tay)
+            endikèt_nimewo.topAnchor.constraint(equalTo: topAnchor, constant: marge_piti),
+            endikèt_nimewo.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -marge_piti),
+            endikèt_nimewo.widthAnchor.constraint(equalToConstant: tay_bad),
+            endikèt_nimewo.heightAnchor.constraint(equalToConstant: tay_bad)
         ])
     }
 
-    // MARK: - Public Configuration
+    // MARK: - Public API
 
     func konfigire(ak katyo: MahjongKatyo) {
         self.katyo = katyo
 
-        let nonRessource = katyo.nonImaj
-        kontenèImaj.image = UIImage(named: nonRessource)
+        let non_ressource = katyo.nonImaj
+        zòn_imaj.image = UIImage(named: non_ressource)
 
-        badNimewo.isHidden = true
-        kouchVizyèl.isHidden = true
+        endikèt_nimewo.isHidden = true
+        kouch_seleksyon.isHidden = true
     }
 
     func aficheNimewo(_ nimewo: Int) {
-        badNimewo.text = String(nimewo)
-        badNimewo.isHidden = false
+        endikèt_nimewo.text = String(nimewo)
+        endikèt_nimewo.isHidden = false
 
-        let transfòmInisyal = CGAffineTransform(scaleX: 0.1, y: 0.1)
-        badNimewo.transform = transfòmInisyal
-        badNimewo.alpha = 0
+        let transformasyon_inisyal = CGAffineTransform(scaleX: 0.1, y: 0.1)
+        endikèt_nimewo.transform = transformasyon_inisyal
+        endikèt_nimewo.alpha = 0
 
         AnimationUtilities.springAnimation(duration: 0.5, damping: 0.5, velocity: 1.0, animations: {
-            self.badNimewo.transform = CGAffineTransform.identity
-            self.badNimewo.alpha = 1
+            self.endikèt_nimewo.transform = CGAffineTransform.identity
+            self.endikèt_nimewo.alpha = 1
         })
         
-        // Add pulse effect
-        AnimationUtilities.pulseAnimation(view: badNimewo)
+        AnimationUtilities.pulseAnimation(view: endikèt_nimewo)
     }
 
     func kacheNimewo() {
-        badNimewo.isHidden = true
+        endikèt_nimewo.isHidden = true
     }
 
-    // MARK: - Selection State Update
+    // MARK: - Selection Visual Update
 
-    private func aplikeChanjmanSeleksyon() {
-        let koulèFwontyè = UIColor(
+    private func aplike_chanjman_vizuèl() {
+        let koulè_bòdè = UIColor(
             red: 51.0/255.0,
             green: 127.0/255.0,
             blue: 204.0/255.0,
@@ -170,28 +165,27 @@ class KatyoCellView: UIView {
         )
 
         if estSeleksyone {
-            kouchVizyèl.isHidden = false
+            kouch_seleksyon.isHidden = false
             layer.borderWidth = 3
-            layer.borderColor = koulèFwontyè.cgColor
+            layer.borderColor = koulè_bòdè.cgColor
         } else {
-            kouchVizyèl.isHidden = true
+            kouch_seleksyon.isHidden = true
             layer.borderWidth = 0
             layer.borderColor = nil
         }
     }
 
-    // MARK: - Animation Methods
+    // MARK: - Animations
 
-    func animeEntransAk(_ reta: TimeInterval) {
+    func animeEntransAk(_ dekala: TimeInterval) {
         alpha = 0
         
-        // 3D flip animation
         layer.transform = CATransform3DMakeRotation(.pi, 0, 1, 0)
         transform = CGAffineTransform(scaleX: 0.3, y: 0.3)
 
         UIView.animate(
             withDuration: 0.6,
-            delay: reta,
+            delay: dekala,
             usingSpringWithDamping: 0.65,
             initialSpringVelocity: 0.8,
             options: [.curveEaseOut, .allowUserInteraction],
@@ -205,13 +199,12 @@ class KatyoCellView: UIView {
     }
 
     func animeSeleksyon() {
-        // 3D bounce with perspective
-        let scaleUp = CGAffineTransform(scaleX: 1.15, y: 1.15)
-        let rotationTransform = CATransform3DMakeRotation(.pi / 16, 0, 1, 0)
+        let echèl_ogmante = CGAffineTransform(scaleX: 1.15, y: 1.15)
+        let rotasyon = CATransform3DMakeRotation(.pi / 16, 0, 1, 0)
         
         AnimationUtilities.springAnimation(duration: 0.3, damping: 0.6, velocity: 0.8, animations: {
-            self.transform = scaleUp
-            self.layer.transform = rotationTransform
+            self.transform = echèl_ogmante
+            self.layer.transform = rotasyon
         }) { _ in
             AnimationUtilities.springAnimation(duration: 0.3, damping: 0.7, animations: {
                 self.transform = .identity
@@ -219,53 +212,52 @@ class KatyoCellView: UIView {
             })
         }
         
-        // Add glow effect
-        addGlowEffect()
+        ajoute_lèm()
     }
     
-    private func addGlowEffect() {
-        let glowLayer = CALayer()
-        glowLayer.frame = bounds
-        glowLayer.cornerRadius = layer.cornerRadius
-        glowLayer.backgroundColor = DesignColors.successGradientStart.cgColor
-        glowLayer.opacity = 0
+    private func ajoute_lèm() {
+        let kouch_lèm = CALayer()
+        kouch_lèm.frame = bounds
+        kouch_lèm.cornerRadius = layer.cornerRadius
+        kouch_lèm.backgroundColor = DesignColors.successGradientStart.cgColor
+        kouch_lèm.opacity = 0
         
-        layer.insertSublayer(glowLayer, at: 0)
+        layer.insertSublayer(kouch_lèm, at: 0)
         
-        let glowAnimation = CABasicAnimation(keyPath: "opacity")
-        glowAnimation.fromValue = 0.6
-        glowAnimation.toValue = 0
-        glowAnimation.duration = 0.5
-        glowAnimation.timingFunction = CAMediaTimingFunction(name: .easeOut)
+        let animasyon_lèm = CABasicAnimation(keyPath: "opacity")
+        animasyon_lèm.fromValue = 0.6
+        animasyon_lèm.toValue = 0
+        animasyon_lèm.duration = 0.5
+        animasyon_lèm.timingFunction = CAMediaTimingFunction(name: .easeOut)
         
-        glowLayer.add(glowAnimation, forKey: "glow")
+        kouch_lèm.add(animasyon_lèm, forKey: "glow")
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            glowLayer.removeFromSuperlayer()
+            kouch_lèm.removeFromSuperlayer()
         }
     }
 
     func animeErè() {
-        let animKeyframe = CAKeyframeAnimation(keyPath: "transform.translation.x")
-        animKeyframe.timingFunction = CAMediaTimingFunction(name: .linear)
-        animKeyframe.duration = 0.5
+        let animasyon_sekous = CAKeyframeAnimation(keyPath: "transform.translation.x")
+        animasyon_sekous.timingFunction = CAMediaTimingFunction(name: .linear)
+        animasyon_sekous.duration = 0.5
 
-        let valèWotasyon: [CGFloat] = [-12, 12, -8, 8, -4, 4, 0]
-        animKeyframe.values = valèWotasyon
+        let valè_dekala: [CGFloat] = [-12, 12, -8, 8, -4, 4, 0]
+        animasyon_sekous.values = valè_dekala
 
-        layer.add(animKeyframe, forKey: "shake")
+        layer.add(animasyon_sekous, forKey: "shake")
 
-        let koulèErè = UIColor(red: 1.0, green: 0.3, blue: 0.3, alpha: 0.3)
-        let koulèNòmal = UIColor(white: 1.0, alpha: 1.0)
+        let koulè_erè = UIColor(red: 1.0, green: 0.3, blue: 0.3, alpha: 0.3)
+        let koulè_orijinal = UIColor(white: 1.0, alpha: 1.0)
 
         UIView.animate(
             withDuration: 0.1,
             animations: {
-                self.backgroundColor = koulèErè
+                self.backgroundColor = koulè_erè
             },
             completion: { _ in
                 UIView.animate(withDuration: 0.3) {
-                    self.backgroundColor = koulèNòmal
+                    self.backgroundColor = koulè_orijinal
                 }
             }
         )

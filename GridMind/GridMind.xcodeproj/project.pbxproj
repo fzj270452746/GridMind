@@ -8,13 +8,30 @@
 
 /* Begin PBXBuildFile section */
 		65A12DBB24F64A63C7EB668C /* Pods_GridMind.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6314E3F01F8D66C5AD6A867 /* Pods_GridMind.framework */; };
+		FF123ABC456DEF7890123456 /* FengduXand.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF123ABC456DEF7890123457 /* FengduXand.xcframework */; };
+		FF123ABC456DEF7890123458 /* FengduXand.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FF123ABC456DEF7890123457 /* FengduXand.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		FF123ABC456DEF7890123459 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				FF123ABC456DEF7890123458 /* FengduXand.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		20B2B1EFD7FCB9E5C7C6FF61 /* Pods-GridMind.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GridMind.debug.xcconfig"; path = "Target Support Files/Pods-GridMind/Pods-GridMind.debug.xcconfig"; sourceTree = "<group>"; };
 		28BBB0CE2EAA05DC001321A8 /* GridMind.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GridMind.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7131ECCC07E2B4D546152B48 /* Pods-GridMind.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GridMind.release.xcconfig"; path = "Target Support Files/Pods-GridMind/Pods-GridMind.release.xcconfig"; sourceTree = "<group>"; };
 		F6314E3F01F8D66C5AD6A867 /* Pods_GridMind.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GridMind.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF123ABC456DEF7890123457 /* FengduXand.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = FengduXand.xcframework; path = GridMind/FengduXand.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -44,6 +61,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				65A12DBB24F64A63C7EB668C /* Pods_GridMind.framework in Frameworks */,
+				FF123ABC456DEF7890123456 /* FengduXand.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,6 +90,7 @@
 			isa = PBXGroup;
 			children = (
 				F6314E3F01F8D66C5AD6A867 /* Pods_GridMind.framework */,
+				FF123ABC456DEF7890123457 /* FengduXand.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -97,6 +116,7 @@
 				28BBB0CB2EAA05DC001321A8 /* Frameworks */,
 				28BBB0CC2EAA05DC001321A8 /* Resources */,
 				384C27CBD704E410FBE99874 /* [CP] Embed Pods Frameworks */,
+				FF123ABC456DEF7890123459 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -163,13 +183,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-GridMind/Pods-GridMind-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-GridMind/Pods-GridMind-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
